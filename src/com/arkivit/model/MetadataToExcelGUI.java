@@ -44,7 +44,7 @@ public class MetadataToExcelGUI{
 	private String duration, fPath, currentFileName, tempString, tempPath, newFileString;
 	private CharsetDetector checkDecoder = new CharsetDetector();
 	private GeneralBean generalBean = new GeneralBean();
-	private DocumentConverter docCon = new DocumentConverter();
+	private DocumentConverter docCon;
 	private ImageFileConverter img = new ImageFileConverter();
 	private FileExtension officeFileEx = new FileExtension();
 	private boolean mapping = false;
@@ -87,10 +87,10 @@ public class MetadataToExcelGUI{
 	 */
 	public void init(boolean mapp, boolean overW) throws IOException{
 		
-		
-		
 		this.mapping = mapp;
 		this.overwrite = overW;
+		
+		docCon = new DocumentConverter();
 		folderName = new File(sourceFolderPath).getName();
 
 
@@ -99,21 +99,24 @@ public class MetadataToExcelGUI{
 			copyFolder();
 		}
 
-		docCon.libreOfficeConnectionMethod(sourceFolderPath);
-		deleteOfficeFiles(sourceFolderPath);
+		//docCon.libreOfficeConnectionMethod();
+		//deleteOfficeFiles(sourceFolderPath);
 		//img.convertImage(sourceFolderPath);
 		//deleteIllegalImageFiles(sourceFolderPath);
 		
 		listOfFilesAndDirectory(sourceFolderPath);
 		
 		getAndAddFileDataToList();
-
-
-		getAndAddFileDataToList();
-		closeLibreOffice();
+		//getAndAddFileDataToList();
+		//closeLibreOffice();
 		
 	}
 	
+	
+	/**
+	 * 
+	 * @param officePath
+	 */
 	public void deleteOfficeFiles(String officePath) 
 	{
 		ArrayList<File> deletedOfficeFilesList = new ArrayList<>();
@@ -136,7 +139,11 @@ public class MetadataToExcelGUI{
 
 		}
 	}
-
+	
+	/**
+	 * 
+	 * @param imagePath
+	 */
 	public void deleteIllegalImageFiles(String imagePath) {
 
 		ArrayList<File> deletedImageFilesList = new ArrayList<>();
@@ -157,7 +164,11 @@ public class MetadataToExcelGUI{
 		} 
 
 	} 
-
+	
+	
+	/**
+	 * 
+	 */
 	//Copying folder to outside of the root folder
 	private void copyFolder() {
 		File selectedFolder = new File(sourceFolderPath);
@@ -183,7 +194,13 @@ public class MetadataToExcelGUI{
 		mappedFiles.clear();
 
 	}
-
+	
+	
+	/**
+	 * 
+	 * @param inputFolder
+	 * @throws IOException
+	 */
 	/* Goes through folder and subfolders and adding files to an ArrayList.
 	 * If mapping = true All files with illegal characters are renamed.
 	 * If file is a directory the path will be retrieved.a
@@ -196,19 +213,19 @@ public class MetadataToExcelGUI{
 		for(File currentFileOrDir : folder.listFiles())
 		{
 
-
 			tempFile = currentFileOrDir;
-
-			//img.convertImage(fileList, sourceFolderPath);
 
 			if(currentFileOrDir.isFile())
 			{
-				if(tempFile.getName().endsWith(".gif") || tempFile.getName().endsWith(".GIF") || 
-						tempFile.getName().endsWith(".jpg") || tempFile.getName().endsWith(".JPG") ||
-						tempFile.getName().endsWith(".bmp") || tempFile.getName().endsWith(".BMP") || 
-						tempFile.getName().endsWith(".wbmp") || tempFile.getName().endsWith("WBMP") ||
-						tempFile.getName().endsWith(".ico") || tempFile.getName().endsWith(".ICO") ||
-						tempFile.getName().endsWith(".svg") || tempFile.getName().endsWith(".SVG")) 
+				
+				if(tempFile.getName().endsWith(".doc") || tempFile.getName().endsWith(".docx") || 
+						tempFile.getName().endsWith(".xls") || tempFile.getName().endsWith(".xlsx") ||
+						tempFile.getName().endsWith(".ppt") || tempFile.getName().endsWith(".pptx")) 
+				{
+					tempFile = docCon.traverseAndConvert1(tempFile);
+				}
+				
+				if(checkForImageFile(tempFile)) 
 				{
 					tempFile = img.convertImage1(tempFile);	
 				}
@@ -218,8 +235,6 @@ public class MetadataToExcelGUI{
 					tempFile = doMapping(currentFileOrDir,false);
 				}
 				
-				
-
 				fileList.add(tempFile);
 				System.out.println("Current File : "  + tempFile.getName());
 				System.out.println("Nr " + fileCount + " : " + currentFileOrDir.getName());
@@ -244,7 +259,13 @@ public class MetadataToExcelGUI{
 		}
 
 	}
-
+	
+	/**
+	 * 
+	 * @param currFileOrDir
+	 * @param isDir
+	 * @return
+	 */
 	public File doMapping(File currFileOrDir, boolean isDir) {
 
 		File tempFile = null;
@@ -291,7 +312,12 @@ public class MetadataToExcelGUI{
 		return tempFile;
 
 	}
-
+	
+	/**
+	 * 
+	 * @param currentString
+	 * @return
+	 */
 	//If String contains illegal characters they will be replaced and returned.
 	private String replaceIllegalChars(String currentString) {
 
@@ -301,7 +327,12 @@ public class MetadataToExcelGUI{
 
 		return currentString;
 	}
-
+	
+	/**
+	 * 
+	 * @param isDir
+	 * @param tempFile
+	 */
 	private void checkForFileOrDirAndSeparateWithExt(boolean isDir, File tempFile) {
 
 		if(!isDir)
@@ -314,7 +345,14 @@ public class MetadataToExcelGUI{
 			fileNameWithOutExt = tempFile.getName();
 		}
 	}
-
+	
+	/**
+	 * 
+	 * @param tempFile
+	 * @param isDir
+	 * @param currFileOrDir
+	 * @return
+	 */
 	private File renameFile(File tempFile, boolean isDir, File currFileOrDir) {
 		if(!isDir)
 		{
@@ -329,7 +367,12 @@ public class MetadataToExcelGUI{
 
 		return tempFile;
 	}
-
+	
+	/**
+	 * 
+	 * @param currFileOrDir
+	 * @return
+	 */
 	private boolean checkIfCurrentFileOrDirContainsIllegalChars(File currFileOrDir) {
 		if(currFileOrDir.getName().contains("å") || currFileOrDir.getName().contains("ä") || currFileOrDir.getName().contains("ö")
 				|| currFileOrDir.getName().contains("ü") || currFileOrDir.getName().contains("Å") || currFileOrDir.getName().contains("Ä") 
@@ -343,7 +386,8 @@ public class MetadataToExcelGUI{
 		}
 
 	}
-
+	
+	
 	/*
 	 * If fileList is not empty:  
 	 * 
@@ -443,7 +487,12 @@ public class MetadataToExcelGUI{
 		} 
 		
 	}
-
+	
+	/**
+	 * 
+	 * @param file
+	 * @throws IOException
+	 */
 	private void changeLinkInFile(File file) throws IOException {
 
 		if(file.getName().endsWith(".html") || file.getName().endsWith(".css") || file.getName().endsWith(".js"))
@@ -483,7 +532,12 @@ public class MetadataToExcelGUI{
 		}
 
 	}
-
+	
+	/**
+	 * 
+	 * @param fullPathforCurrentFile
+	 * @return
+	 */
 	//Checking what kind of charset the file has
 	private Charset getFileDecoder(String fullPathforCurrentFile) {
 		File currentFile = new File(fullPathforCurrentFile);
@@ -493,7 +547,26 @@ public class MetadataToExcelGUI{
 
 		return charsetForfile;
 	}
-
+	
+	
+	private boolean checkForImageFile(File currentfile)
+	{
+		
+		String currfilePath = currentfile.getParentFile().getAbsolutePath() + "/"+ currentfile.getName();
+		String fileType = checkVideoAudioFiles(currfilePath).replaceAll(".*/", "");
+		
+		if(fileType.equals("image"))
+		{
+			return true;
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * 
+	 * @param currentfile
+	 */
 	/*Checks the duration of a video or an audio file ONLY if
 	 * the file is detected as a "video/" or an "audio/" file.
 	 */
@@ -540,12 +613,23 @@ public class MetadataToExcelGUI{
 			}});
 
 	}
-
+	
+	/**
+	 * 
+	 * @param fileType
+	 * @return
+	 */
 	//Checks what type of file it is and returns the type.
 	private String checkVideoAudioFiles(String fileType) {
 		return this.fileType.detect(fileType);
 	}
-
+	
+	
+	/**
+	 * 
+	 * @param stringList
+	 * @return
+	 */
 	@SuppressWarnings("unused")
 	private int getLargestString(List<String> stringList) {
 
@@ -564,6 +648,9 @@ public class MetadataToExcelGUI{
 		return index;
 	}
 	
+	/**
+	 * 
+	 */
 	public void closeLibreOffice() {
 		Runtime rt = Runtime.getRuntime();
 		String libreOfficeApp = "LibreOffice.app";
@@ -596,6 +683,7 @@ public class MetadataToExcelGUI{
 		
 	}
 
+	
 	public String getFolderName() {
 		return folderName;
 	}

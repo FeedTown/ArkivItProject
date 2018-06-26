@@ -19,7 +19,11 @@ import org.apache.batik.transcoder.TranscoderException;
 import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.transcoder.TranscoderOutput;
 
-
+/**
+ * 
+ * @author Saikat
+ *
+ */
 public class ImageFileConverter {
 
 
@@ -33,6 +37,11 @@ public class ImageFileConverter {
 
 	}
 
+	/**
+	 * 
+	 * @param sourceFolderPath
+	 * @throws IOException
+	 */
 	@SuppressWarnings("deprecation")
 	public void convertImage(String sourceFolderPath) throws IOException{
 
@@ -102,22 +111,29 @@ public class ImageFileConverter {
 		}
 
 	}
+	
+	
+	/**
+	 * 
+	 * @param tempFile
+	 * @return
+	 * @throws IOException
+	 */
+	public File convertImage1(File s) throws IOException{
 
-	public File convertImage1(File tempFile) throws IOException{
-
-		File s = tempFile;
+		//File s = tempFile;
 		fileNameWithOutExt = FilenameUtils.removeExtension(s.getName());
 		File newFile = null;
 		if(s.getName().endsWith(".GIF") || s.getName().endsWith(".gif") || s.getName().endsWith(".JPG") || s.getName().endsWith(".jpg")
 				|| s.getName().endsWith(".BMP") || s.getName().endsWith(".bmp") || s.getName().endsWith(".WBMP") || s.getName().endsWith(".wbmp")) {
-			System.out.println("FIRDT IF BLOCK");
+			//System.out.println("FIRDT IF BLOCK");
 			BufferedImage bi = ImageIO.read(new File(s.getAbsolutePath()));
 			
 			newFile = new File(s.getParentFile().getAbsoluteFile(), fileNameWithOutExt + ".jpeg");
 			
 			ImageIO.write(bi, "jpeg", newFile);
 
-			System.out.println("Image " + s.getName() + " was converted succesfully.");
+			//System.out.println("Image " + s.getName() + " was converted succesfully.");
 			
 		}
 
@@ -127,7 +143,7 @@ public class ImageFileConverter {
 			InputStream inputStream = new FileInputStream(s);
 			newFile = new File(s.getParentFile().getAbsoluteFile(), fileNameWithOutExt + ".png");
 			ImageIO.write(ICODecoder.read(inputStream).get(0), "png", newFile );
-			System.out.println("Ico was converted.");
+			//System.out.println("Ico was converted.");
 			inputStream.close();
 
 		}
@@ -161,20 +177,26 @@ public class ImageFileConverter {
 			//storeOriginalImages1(s);
 		}
 		
-		removeOldImgFormatFile(tempFile);
+		removeOldImgFormatFile(s);
 		
-
 		return newFile;
 
 	}
 
 
-
+	/**
+	 * 
+	 * @param tempFile
+	 */
 	private void removeOldImgFormatFile(File tempFile) 
 	{
 		tempFile.delete();
 	}
-
+	
+	/**
+	 * 
+	 * @return
+	 */
 	public ArrayList<File> getOrignalImageFileList() {
 		return orignalImageFileList;
 	}

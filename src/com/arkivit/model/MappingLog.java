@@ -11,6 +11,12 @@ import java.util.logging.SimpleFormatter;
 import com.arkivit.controller.ExcelControllerFX;
 import com.arkivit.view.SecondScene;
 
+/**
+ * 
+ * @author Saikat
+ *
+ */
+
 public class MappingLog {
 
 	MetadataToExcelGUI model = new MetadataToExcelGUI();
@@ -25,7 +31,10 @@ public class MappingLog {
 	public MappingLog(MetadataToExcelGUI model) {
 		this.model = model;
 	}
-
+	
+	/**
+	 * 
+	 */
 	public void mappedLog() {
 
 		Logger logger = Logger.getLogger("MyLog");  
@@ -99,7 +108,15 @@ public class MappingLog {
 
 
 	}
-
+	
+	/**
+	 * 
+	 * @param charMappedList
+	 * @param charIllegalList
+	 * @param log
+	 * @param orgName
+	 * @param mappedName
+	 */
 	private void getLog(ArrayList<File> charMappedList, ArrayList<String> charIllegalList, Logger log, String orgName, String mappedName) {
 		int count = 0;
 		String path ="";
@@ -119,10 +136,19 @@ public class MappingLog {
 
 
 	}
+	
+	/**
+	 * 
+	 * @return
+	 */
 	public File getLogFile() {
 		return logFile;
 	}
-
+	
+	/**
+	 * 
+	 * @param logFile
+	 */
 	public void setLogFile(File logFile) {
 		this.logFile = logFile;
 	}

@@ -8,17 +8,24 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-
+/**
+ * 
+ * @author Saikat
+ *
+ */
 public class ReadAndUpdateLinks {
 
 	private String filePath;
-	private UpdateStringForHtml htmlWordUpdater = new UpdateStringForHtml();
-	private TestJsoup tJsoup = new TestJsoup();
+	private JsoupParser tJsoup = new JsoupParser();
 
 	public ReadAndUpdateLinks(String filePath) {
 		this.filePath = filePath;
 	}
-
+	
+	/**
+	 * 
+	 * @return
+	 */
 	public List<String> readFileAndAddInfoToList()
 	{
 		List<String> list = new ArrayList<String>();
@@ -38,7 +45,15 @@ public class ReadAndUpdateLinks {
 
 		return list;
 	}
-
+	
+	/**
+	 * 
+	 * @param searchWord
+	 * @param updatedWord
+	 * @param brList
+	 * @param fileExt
+	 * @throws IOException
+	 */
 	public void updateInfoInFile(String searchWord, String updatedWord, List<String> brList, String fileExt) throws IOException
 	{
 		
@@ -66,7 +81,12 @@ public class ReadAndUpdateLinks {
 			}
 		}
 	}
-
+	
+	/**
+	 * 
+	 * @param currFile
+	 * @throws IOException
+	 */
 	public void writeToFile(List<String> currFile) throws IOException
 	{
 
@@ -82,11 +102,17 @@ public class ReadAndUpdateLinks {
 
 	}
 	
+	/**
+	 * 
+	 * @param currentLine
+	 * @param searchWord
+	 * @param updatedWord
+	 * @return
+	 */
 	public String updateCssString(String currentLine, String searchWord, String updatedWord)
 	{
-		//System.out.println("Cssline before update : " + currentLine);
 		currentLine = currentLine.replaceAll("\\b"+searchWord+"\\b", updatedWord);
-	
+		
 		return currentLine;
 	}
 

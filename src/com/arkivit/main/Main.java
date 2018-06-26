@@ -5,7 +5,11 @@ import com.arkivit.model.MetadataToExcelGUI;
 import com.arkivit.view.SecondScene;
 import com.arkivit.view.FirstScene;
 
-
+/**
+ * 
+ * @author Saikat
+ *
+ */
 public class Main {
 
 

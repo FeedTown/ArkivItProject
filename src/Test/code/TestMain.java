@@ -1,9 +1,15 @@
 package Test.code;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Scanner;
 
-public class testMain {
+import org.apache.tika.Tika;
+
+public class TestMain {
+	
+	
+	private Tika fileType = new Tika();
 
 	public static void main(String[] args) throws IOException {
 	    /*FileOutputStream inMemoryOut = new FileOutputStream(new File("inMemoryWorkbook.xlsx"));
@@ -18,7 +24,7 @@ public class testMain {
 		
 		//MetadataToExcelGUI data = new MetadataToExcelGUI();
 		//MappingLog mapping = new MappingLog(data);
-		boolean doMapping = false;
+		/*boolean doMapping = false;
 		
 		Scanner scan = new Scanner(System.in);
 		
@@ -37,6 +43,24 @@ public class testMain {
 		
 		//new testMapping(doMapping).init();
 		
-		scan.close();
+		scan.close();*/
+		
+		File tmpFile = new File("H:\\Skrivbord\\img\\kiwi.svg");
+		
+		System.out.println(new TestMain().checkForImageFile(tmpFile));
+	}
+	
+	
+	private String checkForImageFile(File currentfile)
+	{
+		
+		String currfilePath = currentfile.getParentFile().getAbsolutePath() + "/"+ currentfile.getName();
+		String fileType = checkVideoAudioFiles(currfilePath).replaceAll("/.*", "");
+		
+		return fileType;
+	}
+	
+	private String checkVideoAudioFiles(String fileType) {
+		return this.fileType.detect(fileType);
 	}
 }

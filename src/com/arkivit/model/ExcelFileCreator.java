@@ -15,6 +15,12 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 
+/**
+ * 
+ * @author Saikat
+ *
+ */
+
 public class ExcelFileCreator {
 
 	GeneralBean generalBean;
@@ -34,7 +40,20 @@ public class ExcelFileCreator {
 		
 	}
 	
-	
+	/**
+	 * 
+	 * @param fileDuration
+	 * @param fileNameList
+	 * @param filePathList
+	 * @param fileDecodeList
+	 * @param sizeList
+	 * @param fileList
+	 * @param generalBean
+	 * @param targetexcelFilepath
+	 * @param excelFileName
+	 * @param confidentialChecked
+	 * @param personalDataChecked
+	 */
 	public ExcelFileCreator(FileDuration fileDuration, ArrayList<String> fileNameList,
 			ArrayList<String> filePathList, ArrayList<String> fileDecodeList, ArrayList<Long> sizeList,
 			ArrayList<File> fileList, GeneralBean generalBean, String targetexcelFilepath, String excelFileName
@@ -57,6 +76,10 @@ public class ExcelFileCreator {
 
 	}
 	
+	/**
+	 * 
+	 * @throws IOException
+	 */
 	public void createWorkbook() throws IOException {
 		
 		FileOutputStream streamOut = new FileOutputStream(new File(targetexcelFilepath +"/"+ excelFileName));
@@ -71,7 +94,12 @@ public class ExcelFileCreator {
 		System.out.println("End of Workbook method");
 		//clearArrayList();
 	}
-
+	
+	/**
+	 * 
+	 * @param streamWorkbook
+	 * @return
+	 */
 	private CellStyle createRedAndBoldFont(SXSSFWorkbook streamWorkbook) 
 	{
 		
@@ -87,7 +115,12 @@ public class ExcelFileCreator {
 		return style;
 
 	}
-
+	
+	/**
+	 * 
+	 * @param streamWorkbook
+	 * @return
+	 */
 	private CellStyle createBoldFont(SXSSFWorkbook streamWorkbook) 
 	{
 		CellStyle style = streamWorkbook.createCellStyle();
@@ -101,7 +134,12 @@ public class ExcelFileCreator {
 		return style;
 
 	}
-
+	
+	/**
+	 * 
+	 * @param streamWorkbook
+	 * @return
+	 */
 	private CellStyle unLocked(SXSSFWorkbook streamWorkbook) 
 	{
 		CellStyle locked = streamWorkbook.createCellStyle();
@@ -110,6 +148,11 @@ public class ExcelFileCreator {
 		return locked;
 	}
 	
+	/**
+	 * 
+	 * @param streamWorkbook
+	 * @throws IOException
+	 */
 	private void createFirstSheet(SXSSFWorkbook streamWorkbook) throws IOException
 	{
 
@@ -151,7 +194,12 @@ public class ExcelFileCreator {
 		}
 
 	}
-
+	
+	/**
+	 * 
+	 * @param streamWorkbook
+	 * @throws IOException
+	 */
 	private void createSecondSheet(SXSSFWorkbook streamWorkbook) throws IOException 
 	{
 
@@ -242,7 +290,10 @@ public class ExcelFileCreator {
 
 
 
-
+	/**
+	 * 
+	 * @return
+	 */
 	private List<String> getGeneralHeaders() 
 	{
 		List<String> generalHeaderList= new ArrayList<String>();
@@ -269,7 +320,11 @@ public class ExcelFileCreator {
 
 		return generalHeaderList;
 	}
-
+	
+	/**
+	 * 
+	 * @return
+	 */
 	public List<String> getContentList()
 	{
 		List<String> contentList = new ArrayList<>();
@@ -297,7 +352,11 @@ public class ExcelFileCreator {
 		return contentList;	
 	}
 
-
+	/**
+	 * 
+	 * @param fileHeaderList
+	 * @return
+	 */
 	private List<String> addHeadersToList(List<String> fileHeaderList) 
 	{
 		fileHeaderList.add("FILNAMN");
@@ -315,10 +374,18 @@ public class ExcelFileCreator {
 
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public GeneralBean getGeneralBean() {
 		return generalBean;
 	}
-
+	
+	/**
+	 * 
+	 * @param generalBean
+	 */
 	public void setGeneralBean(GeneralBean generalBean) {
 		this.generalBean = generalBean;
 	}

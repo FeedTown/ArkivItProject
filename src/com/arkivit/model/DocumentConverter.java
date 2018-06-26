@@ -19,6 +19,7 @@ import ooo.connector.BootstrapSocketConnector;
 
 public class DocumentConverter {
 
+
 	private XComponentLoader xCompLoader = null;
 	private XDesktop xDesktop;
 	/** Containing the given type to convert to
@@ -47,23 +48,22 @@ public class DocumentConverter {
 	ArrayList<File> convertedFiles;
 	ArrayList<File> fileList = new ArrayList<>(); 
 
-
-
-
-	public DocumentConverter() {
-
+	
+	public DocumentConverter()
+	{	
+		libreOfficeConnectionMethod();
 	}
 
 
 
 
-	public void libreOfficeConnectionMethod(String targetPath) {
+	public void libreOfficeConnectionMethod() {
 
 
 		//String libreOfficePath = "/C:/Program Files (x86)/LibreOffice/program/soffice.exe/";
 		String libreOfficePathMac = "/Applications/LibreOffice.app/Contents/MacOS/";
-		String libreOfficePathWin = "C:/Program Files/LibreOffice/program/soffice.exe/";
-		
+		String libreOfficePathWin = "C:/Program Files/LibreOffice/program/soffice.exe";
+
 
 		XComponentContext xContext = null;
 
@@ -106,7 +106,7 @@ public class DocumentConverter {
 			// origin document
 			sExtension = "pdf";
 
-			traverseAndConvert(targetPath);
+			//traverseAndConvert(targetPath);
 
 		} 
 
@@ -118,8 +118,116 @@ public class DocumentConverter {
 
 	}
 
+	public File traverseAndConvert1(File f)
+	{
+
+		// Converting the document to the favoured type
+		try 
+		{
+			// Composing the URL by replacing all backslashes
+			String testUrl = "file:///" + f.getParentFile().getAbsolutePath().replace("\\", "/");
+			String sUrl = "file:///"
+					+ f.getAbsolutePath().replace( '\\', '/' ); 
+
+
+			/*if(f.getName().endsWith(".doc") || f.getName().endsWith(".docx") || 
+					f.getName().endsWith(".xls") || f.getName().endsWith(".xlsx") ||
+					f.getName().endsWith(".ppt") || f.getName().endsWith(".pptx")) 
+			{ 
+				System.out.println("Original Files: "+  f.getName());*/
+
+
+			// Loading the wanted document
+			PropertyValue propertyValues[] = new PropertyValue[1];
+			propertyValues[0] = new PropertyValue();
+			propertyValues[0].Name = "Hidden";
+			propertyValues[0].Value = Boolean.TRUE;
+
+			Object oDocToStore = xCompLoader.loadComponentFromURL(
+					sUrl, "_blank", 0, propertyValues);
+
+			// Getting an object that will offer a simple way to store
+			// a document to a URL.			
+
+			XStorable xStorable =
+					UnoRuntime.queryInterface(XStorable.class, oDocToStore );
+
+			// Preparing properties for converting the document
+			propertyValues = new PropertyValue[3];
+			// Setting the flag for overwriting
+			propertyValues[0] = new PropertyValue();
+			propertyValues[0].Name = "Overwrite";
+			propertyValues[0].Value = Boolean.TRUE;
+			// Setting the filter name
+			propertyValues[1] = new PropertyValue();
+			propertyValues[1].Name = "FilterName";
+			propertyValues[1].Value = sConvertType;
+
+			propertyValues[2] = new PropertyValue();
+			propertyValues[2].Name = "PDFViewSelection";
+			propertyValues[2].Value = 2;
+
+			// Appending the favoured extension to the origin document name
+
+			String tmp = FilenameUtils.removeExtension(f.getName());
+
+			String sStoreUrl = testUrl+ "/" + tmp + "." + sExtension;  
+			xStorable.storeToURL(sStoreUrl, propertyValues);
+
+			String removeBeginningOfPath = sStoreUrl.replace("file:///", "");
+			testFile = new File(removeBeginningOfPath);
+
+			fileList.add(testFile);
+			System.out.println("Converted Files " + testFile.getName());
+
+			//removeFile(fileDirectory);
+			// Closing the converted document. Use XCloseable.close if the
+			// interface is supported, otherwise use XComponent.dispose
+			XCloseable xCloseable =
+					UnoRuntime.queryInterface(XCloseable.class, xStorable);
+
+
+			if ( xCloseable != null ) 
+			{
+				xCloseable.close(false);
+			} 
+
+			else 
+			{
+				XComponent xComp =
+						UnoRuntime.queryInterface(XComponent.class, xStorable);
+
+				xComp.dispose();
+			}
+
+
+			//}
+
+			/*else 
+			{
+				System.out.println("NOT CONVERTED : " + f.getName());
+
+			} */
+		}
+
+		catch( Exception e ) 
+		{
+			e.printStackTrace(System.err);
+		}
+
+		removeOldImgFormatFile(f);
+
+		return testFile;
+	}
+
+
+	private void removeOldImgFormatFile(File tempFile) 
+	{
+		tempFile.delete();
+	}
+
 	public void traverseAndConvert(String targetPath) {
-		
+
 		fileDirectory = new File(targetPath);
 		sOutUrl = "file:///" + fileDirectory.getAbsolutePath().replace( '\\', '/' );
 

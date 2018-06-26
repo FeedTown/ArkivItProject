@@ -8,9 +8,21 @@ import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 
+/**
+ * 
+ * @author Saikat
+ *
+ */
 
 public class CharsetDetector {
 
+	
+	/**
+	 * 
+	 * @param f
+	 * @param charsets
+	 * @return
+	 */
     public Charset detectCharset(File f, String[] charsets) {
 
         Charset charset = null;
@@ -24,7 +36,13 @@ public class CharsetDetector {
 
         return charset;
     }
-
+    
+    /**
+     * 
+     * @param f
+     * @param charset
+     * @return
+     */
     private Charset detectCharset(File f, Charset charset) {
         try {
             BufferedInputStream input = new BufferedInputStream(new FileInputStream(f));
@@ -50,7 +68,13 @@ public class CharsetDetector {
             return null;
         }
     }
-
+    
+    /**
+     * 
+     * @param bytes
+     * @param decoder
+     * @return
+     */
     private boolean identify(byte[] bytes, CharsetDecoder decoder) {
         try {
             decoder.decode(ByteBuffer.wrap(bytes));

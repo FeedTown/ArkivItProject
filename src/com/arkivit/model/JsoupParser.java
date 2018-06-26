@@ -4,9 +4,21 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
+/**
+ * 
+ * @author Saikat
+ *
+ */
 
-public class TestJsoup {
+public class JsoupParser {
 
+	/**
+	 * 
+	 * @param currentLine
+	 * @param searchWord
+	 * @param updatedWord
+	 * @return
+	 */
 	public String jSoupExtractElementsFromHtmlFile(String currentLine, String searchWord, String updatedWord)
 	{
 			String linkToFile = "", newString = "";

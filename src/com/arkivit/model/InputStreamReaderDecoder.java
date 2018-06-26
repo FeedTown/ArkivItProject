@@ -1,17 +1,26 @@
 package com.arkivit.model;
 
-
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
+/**
+ * 
+ * @author Saikat
+ *
+ */
 public class InputStreamReaderDecoder {
 
 	FileInputStream fileInputStream = null;
 	InputStreamReader inputStreamReader = null;
 	ArrayList<String> utfList = new ArrayList<>();
 	String utfString;
-
+	
+	/**
+	 * 
+	 * @param sourcePath
+	 * @param destinationPath
+	 */
 	public void fileEncoder(String sourcePath, String destinationPath)  {
 		try {
 			// new input stream reader is created 
@@ -42,18 +51,34 @@ public class InputStreamReaderDecoder {
 		}   
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public ArrayList<String> getUtfList() {
 		return utfList;
 	}
-
+	
+	/**
+	 * 
+	 * @param utfList
+	 */
 	public void setUtfList(ArrayList<String> utfList) {
 		this.utfList = utfList;
 	}
-
+	
+	/**
+	 * 
+	 * @return
+	 */
 	public String getUtfString() {
 		return utfString;
 	}
-
+	
+	/**
+	 * 
+	 * @param utfString
+	 */
 	public void setUtfString(String utfString) {
 		this.utfString = utfString;
 	}
