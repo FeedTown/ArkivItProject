@@ -45,7 +45,7 @@ public class TestMain {
 		
 		scan.close();*/
 		
-		File tmpFile = new File("H:\\Skrivbord\\img\\kiwi.svg");
+		File tmpFile = new File("H:\\Skrivbord\\TestFolder\\bugFixFiles\\TestFilesWithHTML1\\TestFiles\\subfolder\\m.xls");
 		
 		System.out.println(new TestMain().checkForImageFile(tmpFile));
 	}

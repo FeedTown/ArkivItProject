@@ -91,6 +91,7 @@ public class MetadataToExcelGUI{
 		this.overwrite = overW;
 		
 		docCon = new DocumentConverter();
+		
 		folderName = new File(sourceFolderPath).getName();
 
 
@@ -106,9 +107,11 @@ public class MetadataToExcelGUI{
 		
 		listOfFilesAndDirectory(sourceFolderPath);
 		
+		closeLibreOffice();
+		deleteOfficeFiles();
+		
 		getAndAddFileDataToList();
 		//getAndAddFileDataToList();
-		//closeLibreOffice();
 		
 	}
 	
@@ -117,27 +120,14 @@ public class MetadataToExcelGUI{
 	 * 
 	 * @param officePath
 	 */
-	public void deleteOfficeFiles(String officePath) 
+	public void deleteOfficeFiles() 
 	{
-		ArrayList<File> deletedOfficeFilesList = new ArrayList<>();
-
+		
 		for(File f : docCon.getOriginalListFile()) 
 		{
-
-			if(f.getName().endsWith(".doc") || f.getName().endsWith(".DOC") || 
-					f.getName().endsWith(".docx") || f.getName().endsWith(".DOCX") ||
-					f.getName().endsWith(".xls") || f.getName().endsWith(".XLS") ||
-					f.getName().endsWith(".xlsx") || f.getName().endsWith(".XLSX") ||
-					f.getName().endsWith(".ppt") || f.getName().endsWith(".PPT") ||
-					f.getName().endsWith(".pptx") || f.getName().endsWith(".PPTX"))
-			{
-
-				deletedOfficeFilesList.remove(f);
-				f.delete();
-			}
-
-
+			docCon.removeOldImgFormatFile(f);
 		}
+		docCon.originalListFile.clear();
 	}
 	
 	/**
@@ -207,52 +197,52 @@ public class MetadataToExcelGUI{
 	 */
 	private void listOfFilesAndDirectory(String inputFolder) throws IOException {
 		File folder = new File(inputFolder);
-		File tempFile;
+		File tempFile = null;
 		
 
 		for(File currentFileOrDir : folder.listFiles())
 		{
 
-			tempFile = currentFileOrDir;
-
 			if(currentFileOrDir.isFile())
 			{
+				//tempFile = new File(currentFileOrDir.getAbsolutePath());
 				
-				if(tempFile.getName().endsWith(".doc") || tempFile.getName().endsWith(".docx") || 
-						tempFile.getName().endsWith(".xls") || tempFile.getName().endsWith(".xlsx") ||
-						tempFile.getName().endsWith(".ppt") || tempFile.getName().endsWith(".pptx")) 
+				if(checkForImageFile(currentFileOrDir))
 				{
-					tempFile = docCon.traverseAndConvert1(tempFile);
+					currentFileOrDir = new File(img.convertImage1(currentFileOrDir).getAbsolutePath());	
 				}
 				
-				if(checkForImageFile(tempFile)) 
+				if(currentFileOrDir.getName().endsWith(".doc") || currentFileOrDir.getName().endsWith(".docx") || 
+						currentFileOrDir.getName().endsWith(".xls") || currentFileOrDir.getName().endsWith(".xlsx") ||
+						currentFileOrDir.getName().endsWith(".ppt") || currentFileOrDir.getName().endsWith(".pptx")) 
 				{
-					tempFile = img.convertImage1(tempFile);	
+					currentFileOrDir = new File(docCon.traverseAndConvert1(currentFileOrDir).getAbsolutePath());
 				}
 				
 				if(mapping)
 				{
-					tempFile = doMapping(currentFileOrDir,false);
+					currentFileOrDir = doMapping(currentFileOrDir,false);
 				}
 				
-				fileList.add(tempFile);
-				System.out.println("Current File : "  + tempFile.getName());
+				
+				fileList.add(currentFileOrDir);
+				System.out.println("Current File : "  + currentFileOrDir.getName());
 				System.out.println("Nr " + fileCount + " : " + currentFileOrDir.getName());
 				fileCount++;
 
 			}
-
 			else if(currentFileOrDir.isDirectory())	
 			{
+				tempFile = new File(currentFileOrDir.getAbsolutePath());
 				
 				if(mapping)
 				{
-					tempFile = doMapping(currentFileOrDir,true);
+					currentFileOrDir = doMapping(currentFileOrDir,true);
 				}
 
 				System.out.println("Current Dir : "  + currentFileOrDir.getName());
 
-				listOfFilesAndDirectory(tempFile.getAbsolutePath());
+				listOfFilesAndDirectory(currentFileOrDir.getAbsolutePath());
 			}
 			count++;
 
@@ -522,8 +512,6 @@ public class MetadataToExcelGUI{
 
 					}
 
-
-					
 				}
 				counter++;
 				
@@ -549,14 +537,26 @@ public class MetadataToExcelGUI{
 	}
 	
 	
-	private boolean checkForImageFile(File currentfile)
+	private boolean checkForImageFile(File f)
 	{
 		
-		String currfilePath = currentfile.getParentFile().getAbsolutePath() + "/"+ currentfile.getName();
-		String fileType = checkVideoAudioFiles(currfilePath).replaceAll(".*/", "");
+		/*String currfilePath = f.getParentFile().getAbsolutePath() + "/"+ f.getName();
+		String fileType = checkVideoAudioFiles(currfilePath).replaceAll("/.*", "");*/
 		
-		if(fileType.equals("image"))
+		//System.out.println("Filetype : " + fileType);
+		
+		/*if(fileType.equals("image"))
 		{
+			return true;
+		}*/
+		
+		if(f.getName().endsWith(".gif") || f.getName().endsWith(".GIF") || 
+				f.getName().endsWith(".jpg") || f.getName().endsWith(".JPG") ||
+				f.getName().endsWith(".bmp") || f.getName().endsWith(".BMP") || 
+				f.getName().endsWith(".wbmp") || f.getName().endsWith("WBMP") ||
+				f.getName().endsWith(".ico") || f.getName().endsWith(".ICO") ||
+				f.getName().endsWith(".svg") || f.getName().endsWith(".SVG")) {
+
 			return true;
 		}
 		

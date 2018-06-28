@@ -155,7 +155,7 @@ public class ExcelControllerFX extends Application {
 		secondScene.getSaveTxtField().setText("");
 		secondScene.getBtnConvert().setDisable(true);
 
-		if(!check) {
+		/*if(!check) {
 			progressBar();
 			secondScene.getOpenTxtField().setText("");
 			secondScene.getSaveTxtField().setText("");
@@ -165,8 +165,7 @@ public class ExcelControllerFX extends Application {
 			progressBar();
 			secondScene.getOpenTxtField().setText("");
 			secondScene.getSaveTxtField().setText("");
-
-		}
+		}*/
 
 	}
 

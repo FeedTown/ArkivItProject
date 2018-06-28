@@ -124,16 +124,17 @@ public class ImageFileConverter {
 		//File s = tempFile;
 		fileNameWithOutExt = FilenameUtils.removeExtension(s.getName());
 		File newFile = null;
+		
 		if(s.getName().endsWith(".GIF") || s.getName().endsWith(".gif") || s.getName().endsWith(".JPG") || s.getName().endsWith(".jpg")
 				|| s.getName().endsWith(".BMP") || s.getName().endsWith(".bmp") || s.getName().endsWith(".WBMP") || s.getName().endsWith(".wbmp")) {
 			//System.out.println("FIRDT IF BLOCK");
-			BufferedImage bi = ImageIO.read(new File(s.getAbsolutePath()));
+			BufferedImage bi = ImageIO.read(s);
 			
 			newFile = new File(s.getParentFile().getAbsoluteFile(), fileNameWithOutExt + ".jpeg");
 			
 			ImageIO.write(bi, "jpeg", newFile);
-
-			//System.out.println("Image " + s.getName() + " was converted succesfully.");
+			
+			//System.out.println("Image " + newFile.getName() + " was converted succesfully.");
 			
 		}
 
@@ -143,14 +144,17 @@ public class ImageFileConverter {
 			InputStream inputStream = new FileInputStream(s);
 			newFile = new File(s.getParentFile().getAbsoluteFile(), fileNameWithOutExt + ".png");
 			ImageIO.write(ICODecoder.read(inputStream).get(0), "png", newFile );
-			//System.out.println("Ico was converted.");
+			System.out.println("Ico was converted.");
 			inputStream.close();
 
 		}
 
 		if(s.getName().endsWith(".svg") || s.getName().endsWith(".SVG")) 
 		{
-			String svgURI = Paths.get(s.getAbsolutePath()).toUri().toString();
+			//String svgURI = Paths.get(s.getAbsolutePath()).toUri().toString();
+			
+			String svgURI = s.toPath().toUri().toString();
+			//String svgURI = s.getAbsolutePath();
 			TranscoderInput input = new TranscoderInput(svgURI);
 			
 			newFile = new File(s.getParentFile().getAbsoluteFile(), fileNameWithOutExt + ".png");
@@ -202,6 +206,8 @@ public class ImageFileConverter {
 	}
 
 
+	
+	
 	private void oldCodes()
 	{
 		/*public void storeOriginalImages(ArrayList<File> file) throws IOException {

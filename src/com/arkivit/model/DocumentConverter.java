@@ -1,6 +1,7 @@
 package com.arkivit.model;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import org.apache.commons.io.FilenameUtils;
@@ -81,7 +82,7 @@ public class DocumentConverter {
 			else if(osName.contains("Mac") || osName.contains("Ubuntu") || osName.contains("Debian"))
 			{
 				xContext = BootstrapSocketConnector.bootstrap(libreOfficePathMac);
-				System.out.println("Connected to a running office ...");
+				//System.out.println("Connected to a running office ...");
 			}
 
 
@@ -121,7 +122,7 @@ public class DocumentConverter {
 	public File traverseAndConvert1(File f)
 	{
 
-		// Converting the document to the favoured type
+		// Converting the document to the favored type
 		try 
 		{
 			// Composing the URL by replacing all backslashes
@@ -154,6 +155,7 @@ public class DocumentConverter {
 
 			// Preparing properties for converting the document
 			propertyValues = new PropertyValue[3];
+			
 			// Setting the flag for overwriting
 			propertyValues[0] = new PropertyValue();
 			propertyValues[0].Name = "Overwrite";
@@ -167,8 +169,7 @@ public class DocumentConverter {
 			propertyValues[2].Name = "PDFViewSelection";
 			propertyValues[2].Value = 2;
 
-			// Appending the favoured extension to the origin document name
-
+			//Appending the favored extension to the origin document name
 			String tmp = FilenameUtils.removeExtension(f.getName());
 
 			String sStoreUrl = testUrl+ "/" + tmp + "." + sExtension;  
@@ -214,14 +215,48 @@ public class DocumentConverter {
 		{
 			e.printStackTrace(System.err);
 		}
-
-		removeOldImgFormatFile(f);
+		
+		originalListFile.add(f);
+		
+		//closeLibreOffice();
+		//removeOldImgFormatFile(f);
 
 		return testFile;
 	}
+	
+	public void closeLibreOffice() {
+		Runtime rt = Runtime.getRuntime();
+		String libreOfficeApp = "LibreOffice.app";
+		String  osName;
+		
+		try 
+
+		{
+			osName = System.getProperty("os.name");
+			//test(p.getInputStream());
+			if(osName.contains("Windows"))
+			{
+				rt.exec("taskkill /IM soffice.bin");
+			}
+			else if(osName.contains("Mac") || osName.contains("Ubuntu") || osName.contains("Debian"))
+			{
+				rt.exec("pkill -f " + libreOfficeApp);
+			}
 
 
-	private void removeOldImgFormatFile(File tempFile) 
+		} 
+
+		catch (IOException e) 
+		{
+
+			e.printStackTrace();
+
+		} 
+		
+		
+	}
+
+	public void removeOldImgFormatFile(File tempFile) 
 	{
 		tempFile.delete();
 	}
