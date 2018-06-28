@@ -127,8 +127,9 @@ public class DocumentConverter {
 		{
 			// Composing the URL by replacing all backslashes
 			String testUrl = "file:///" + f.getParentFile().getAbsolutePath().replace("\\", "/");
-			String sUrl = "file:///"
-					+ f.getAbsolutePath().replace( '\\', '/' ); 
+			String toUri = f.toPath().toUri().toString();
+			String sUrl = "file:///" + f.getAbsolutePath().replace( '\\', '/' );
+			//String sUrl = f.toPath().toUri().toString();
 
 
 			/*if(f.getName().endsWith(".doc") || f.getName().endsWith(".docx") || 

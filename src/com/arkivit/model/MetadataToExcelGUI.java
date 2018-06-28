@@ -359,6 +359,20 @@ public class MetadataToExcelGUI{
 	}
 	
 	/**
+	 * This is what i done for past few days in this project. Sometimes i was stuck and some other times went by a flow.
+	 * Soon i will start with the web application project. This desktop installer app will turn into a web app. I don't how long time it will take me 
+	 * to finish the app after all I'm working alone. I have to learn spring boot, jsf etc for making the web app . This will be a huge step up for me. At the moment i kind of lazy to start with the web app, I am kind 
+	 * of tired. I really wanted to sleep after the work but I can't because I have to go to another work so I'll try to take a powernap. I am going leave the office
+	 * around 14:45 or 14.30. 
+	 * 
+	 * I haven't done so much except fixing a error that I found on Tuesday. This is kind of getting boring. I have lck summersplit match on the background where Skt and KZ
+	 * playing with eachother.      
+	 * 
+	 * 
+	 */
+	
+	
+	/**
 	 * 
 	 * @param currFileOrDir
 	 * @return
@@ -460,7 +474,6 @@ public class MetadataToExcelGUI{
 		fileListeLength = fileNameList.size();
 
 		System.out.println("File name list length : " + fileListeLength);
-
 
 		//System.out.println("Last list check....:" + fileNameList);
 		try {

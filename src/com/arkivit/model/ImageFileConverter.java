@@ -121,20 +121,17 @@ public class ImageFileConverter {
 	 */
 	public File convertImage1(File s) throws IOException{
 
-		//File s = tempFile;
 		fileNameWithOutExt = FilenameUtils.removeExtension(s.getName());
 		File newFile = null;
 		
 		if(s.getName().endsWith(".GIF") || s.getName().endsWith(".gif") || s.getName().endsWith(".JPG") || s.getName().endsWith(".jpg")
 				|| s.getName().endsWith(".BMP") || s.getName().endsWith(".bmp") || s.getName().endsWith(".WBMP") || s.getName().endsWith(".wbmp")) {
-			//System.out.println("FIRDT IF BLOCK");
+
 			BufferedImage bi = ImageIO.read(s);
 			
 			newFile = new File(s.getParentFile().getAbsoluteFile(), fileNameWithOutExt + ".jpeg");
 			
 			ImageIO.write(bi, "jpeg", newFile);
-			
-			//System.out.println("Image " + newFile.getName() + " was converted succesfully.");
 			
 		}
 
@@ -151,10 +148,7 @@ public class ImageFileConverter {
 
 		if(s.getName().endsWith(".svg") || s.getName().endsWith(".SVG")) 
 		{
-			//String svgURI = Paths.get(s.getAbsolutePath()).toUri().toString();
-			
 			String svgURI = s.toPath().toUri().toString();
-			//String svgURI = s.getAbsolutePath();
 			TranscoderInput input = new TranscoderInput(svgURI);
 			
 			newFile = new File(s.getParentFile().getAbsoluteFile(), fileNameWithOutExt + ".png");
