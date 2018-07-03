@@ -1,4 +1,4 @@
-package com.arkivit.model;
+package com.arkivit.model.file;
 
 public class FileInfoStorageBean {
 	

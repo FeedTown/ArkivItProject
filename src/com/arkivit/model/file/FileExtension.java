@@ -1,4 +1,4 @@
-package com.arkivit.model;
+package com.arkivit.model.file;
 
 import java.io.File;
 import java.util.ArrayList;

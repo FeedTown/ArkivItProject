@@ -1,4 +1,4 @@
-package com.arkivit.model;
+package com.arkivit.model.excel;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -14,6 +14,10 @@ import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+
+import com.arkivit.model.file.FileDuration;
+import com.arkivit.model.file.FileInfoStorageBean;
+import com.arkivit.model.file.GeneralBean;
 
 /**
  * 

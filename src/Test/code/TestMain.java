@@ -47,13 +47,21 @@ public class TestMain {
 		
 		File tmpFile = new File("H:\\Skrivbord\\TestFolder\\bugFixFiles\\TestFilesWithHTML1\\TestFiles\\subfolder\\m.xls");
 		
-		String uri = tmpFile.toPath().toAbsolutePath().toString();
+		String uri = tmpFile.toPath().getParent().toUri().toString();
 		String url = tmpFile.getParentFile().getAbsolutePath();
+		
+		
 		
 		System.out.println(uri);
 		System.out.println(url);
 		
-		System.out.println(new TestMain().checkForImageFile(tmpFile));
+		File f = new File(uri);
+		
+		String test = f.toURI().toURL().getFile().toString();
+		
+		System.out.println(test);
+		
+		//System.out.println(new TestMain().checkForImageFile(tmpFile));
 	}
 	
 	

@@ -12,6 +12,14 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.tika.Tika;
+
+import com.arkivit.model.converters.DocumentConverter;
+import com.arkivit.model.converters.ImageFileConverter;
+import com.arkivit.model.excel.ExcelFileCreator;
+import com.arkivit.model.file.FileDuration;
+import com.arkivit.model.file.FileExtension;
+import com.arkivit.model.file.GeneralBean;
+import com.arkivit.model.parser.ReadAndUpdateLinks;
 import com.arkivit.view.FirstScene;
 
 
@@ -125,16 +133,17 @@ public class MetadataToExcelGUI{
 		
 		for(File f : docCon.getOriginalListFile()) 
 		{
-			docCon.removeOldImgFormatFile(f);
+			docCon.removeMsOfficeFormatFile(f);
 		}
-		docCon.originalListFile.clear();
+		docCon.getOriginalListFile().clear();
 	}
 	
 	/**
 	 * 
 	 * @param imagePath
 	 */
-	public void deleteIllegalImageFiles(String imagePath) {
+	public void deleteIllegalImageFiles(String imagePath) 
+	{
 
 		ArrayList<File> deletedImageFilesList = new ArrayList<>();
 
@@ -173,8 +182,8 @@ public class MetadataToExcelGUI{
 	}
 
 	//Clear ArrayList(s) if they aren't empty
-	public void clearArrayList() {
-
+	public void clearArrayList() 
+	{
 		fileList.clear();
 		fileNameList.clear();
 		sizeList.clear();
@@ -187,7 +196,7 @@ public class MetadataToExcelGUI{
 	
 	
 	/**
-	 * 
+	 * listOfFilesAndDirectory method goes throw files in a folder and sub-folder.
 	 * @param inputFolder
 	 * @throws IOException
 	 */
@@ -207,22 +216,7 @@ public class MetadataToExcelGUI{
 			{
 				//tempFile = new File(currentFileOrDir.getAbsolutePath());
 				
-				if(checkForImageFile(currentFileOrDir))
-				{
-					currentFileOrDir = new File(img.convertImage1(currentFileOrDir).getAbsolutePath());	
-				}
-				
-				if(currentFileOrDir.getName().endsWith(".doc") || currentFileOrDir.getName().endsWith(".docx") || 
-						currentFileOrDir.getName().endsWith(".xls") || currentFileOrDir.getName().endsWith(".xlsx") ||
-						currentFileOrDir.getName().endsWith(".ppt") || currentFileOrDir.getName().endsWith(".pptx")) 
-				{
-					currentFileOrDir = new File(docCon.traverseAndConvert1(currentFileOrDir).getAbsolutePath());
-				}
-				
-				if(mapping)
-				{
-					currentFileOrDir = doMapping(currentFileOrDir,false);
-				}
+				currentFileOrDir = fileStatmentChecker(currentFileOrDir);
 				
 				
 				fileList.add(currentFileOrDir);
@@ -233,7 +227,7 @@ public class MetadataToExcelGUI{
 			}
 			else if(currentFileOrDir.isDirectory())	
 			{
-				tempFile = new File(currentFileOrDir.getAbsolutePath());
+				//tempFile = new File(currentFileOrDir.getAbsolutePath());
 				
 				if(mapping)
 				{
@@ -250,6 +244,47 @@ public class MetadataToExcelGUI{
 
 	}
 	
+	
+	/**
+	 * 
+	 * @param currentFileOrDir
+	 * @return
+	 * @throws IOException
+	 * 
+	 */
+	private File fileStatmentChecker(File currentFileOrDir) throws IOException {
+		
+		if(checkForImageFile(currentFileOrDir))
+		{
+			currentFileOrDir = new File(img.convertImage1(currentFileOrDir).getAbsolutePath());	
+		}
+				
+		if(checkForMsOfficeFiles(currentFileOrDir))
+		{
+			currentFileOrDir = new File(docCon.traverseAndConvert1(currentFileOrDir).getAbsolutePath());
+		}
+		
+		if(mapping)
+		{
+			currentFileOrDir = doMapping(currentFileOrDir,false);
+		}
+		
+		
+		return currentFileOrDir;
+	}
+
+	private boolean checkForMsOfficeFiles(File currentFileOrDir) {
+		
+		if(currentFileOrDir.getName().endsWith(".doc") || currentFileOrDir.getName().endsWith(".docx") || 
+				currentFileOrDir.getName().endsWith(".xls") || currentFileOrDir.getName().endsWith(".xlsx") ||
+				currentFileOrDir.getName().endsWith(".ppt") || currentFileOrDir.getName().endsWith(".pptx")) 
+		{
+			return true;
+		}
+		
+		return false;
+	}
+
 	/**
 	 * 
 	 * @param currFileOrDir
@@ -357,25 +392,29 @@ public class MetadataToExcelGUI{
 
 		return tempFile;
 	}
-	
-	/**
-	 * This is what i done for past few days in this project. Sometimes i was stuck and some other times went by a flow.
-	 * Soon i will start with the web application project. This desktop installer app will turn into a web app. I don't how long time it will take me 
-	 * to finish the app after all I'm working alone. I have to learn spring boot, jsf etc for making the web app . This will be a huge step up for me. At the moment i kind of lazy to start with the web app, I am kind 
-	 * of tired. I really wanted to sleep after the work but I can't because I have to go to another work so I'll try to take a powernap. I am going leave the office
-	 * around 14:45 or 14.30. 
+		
+	/*
+	 * It's Tuesday and I'm still tired. I don't feel like to code and I'm booked for meeting tomorrow with two coworkers.
+	 * I have to give demo to them about what I have done until now and then also what plans is. What I want to do after I'm done with this project.
+	 * So I have to prepare for tomorrow.
+	 *  
+	 * 13:29 - What is my plan for today? Not much, I have shrinked the the listOfFiles func and organized the model package to sub model packages. It is much 
+	 * more easier to read.    
 	 * 
-	 * I haven't done so much except fixing a error that I found on Tuesday. This is kind of getting boring. I have lck summersplit match on the background where Skt and KZ
-	 * playing with eachother.      
+	 * 13:40 - When will you leave the office? I will leave the office around 15.00. 
 	 * 
-	 * 
+	 * 13:53 - What will you do when you arrive home? I don't really know, maybe sleep for few hours to recover sleep hours that I have missed. I feel so down when I don't get enough hours of sleep.
+	 * It feels so good that I don't work today at Posten. 
+	 *  
 	 */
 	
 	
 	/**
+	 * This boolean method checks if a name of file/folder contains illegal character outside of English characters and return true or false depending
+	 * on if illegal character contains on name or not.   
 	 * 
-	 * @param currFileOrDir
-	 * @return
+	 * @param currFileOrDir Is a File object represent current file in the system from selected folder.
+	 * @return Returns true if illegal character found. <br> Returns false if illegal character not found.  
 	 */
 	private boolean checkIfCurrentFileOrDirContainsIllegalChars(File currFileOrDir) {
 		if(currFileOrDir.getName().contains("å") || currFileOrDir.getName().contains("ä") || currFileOrDir.getName().contains("ö")
@@ -454,8 +493,6 @@ public class MetadataToExcelGUI{
 					{
 						fileDecodeList.add(getDecoding.name());
 					}
-
-
 
 					fileNameList.add(currentFileName);			
 					sizeList.add(fileSize);
@@ -664,7 +701,8 @@ public class MetadataToExcelGUI{
 	/**
 	 * 
 	 */
-	public void closeLibreOffice() {
+	public void closeLibreOffice() 
+	{
 		Runtime rt = Runtime.getRuntime();
 		String libreOfficeApp = "LibreOffice.app";
 		String  osName;

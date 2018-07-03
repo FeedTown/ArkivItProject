@@ -1,4 +1,4 @@
-package com.arkivit.model;
+package com.arkivit.model.converters;
 
 import java.io.File;
 import java.io.IOException;
@@ -45,7 +45,7 @@ public class DocumentConverter {
 
 
 	File fileDirectory;
-	ArrayList<File> originalListFile = new ArrayList<>();
+	private ArrayList<File> originalListFile = new ArrayList<>();
 	ArrayList<File> convertedFiles;
 	ArrayList<File> fileList = new ArrayList<>(); 
 
@@ -126,10 +126,10 @@ public class DocumentConverter {
 		try 
 		{
 			// Composing the URL by replacing all backslashes
-			String testUrl = "file:///" + f.getParentFile().getAbsolutePath().replace("\\", "/");
-			String toUri = f.toPath().toUri().toString();
-			String sUrl = "file:///" + f.getAbsolutePath().replace( '\\', '/' );
-			//String sUrl = f.toPath().toUri().toString();
+			//String testUrl = "file:///" + f.getParentFile().getAbsolutePath().replace("\\", "/");
+			String testUrl = f.toPath().getParent().toUri().toString();
+			//String sUrl = "file:///" + f.getAbsolutePath().replace( '\\', '/' );
+			String sUrl = f.toPath().toUri().toString();
 
 
 			/*if(f.getName().endsWith(".doc") || f.getName().endsWith(".docx") || 
@@ -257,7 +257,7 @@ public class DocumentConverter {
 		
 	}
 
-	public void removeOldImgFormatFile(File tempFile) 
+	public void removeMsOfficeFormatFile(File tempFile) 
 	{
 		tempFile.delete();
 	}

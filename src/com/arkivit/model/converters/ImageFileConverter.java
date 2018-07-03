@@ -1,4 +1,4 @@
-package com.arkivit.model;
+package com.arkivit.model.converters;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -31,7 +31,6 @@ public class ImageFileConverter {
 	private File imgFile;
 	private ArrayList<File> imgList = new ArrayList<>();
 	private ArrayList<File> orignalImageFileList = new ArrayList<>();
-
 
 	public ImageFileConverter() {
 
