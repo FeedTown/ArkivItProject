@@ -50,7 +50,7 @@ public class FileExtension {
 				docxExt = ".docx"*/;
 
 
-		if(getFileName.endsWith(pdfExt) || getFileName.endsWith(gifExt) || getFileName.endsWith(pngExt) || getFileName.endsWith(jpgExt) ||
+		if(getFileName.endsWith(pdfExt) || getFileName.endsWith(pngExt) || 
 				getFileName.endsWith(jpegExt) || getFileName.endsWith(jsExt) || getFileName.endsWith(imgExt))
 		{
 			return true;

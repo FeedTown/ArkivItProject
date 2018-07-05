@@ -27,7 +27,7 @@ import com.arkivit.view.FirstScene;
  * This class is handling the process of sending data and importing metadata
  * to two excel sheets.
  * 
- * @author RobertoBlanco, Saikat Takluder, Kevin Olofosson
+ * @author Roberto Blanco, Saikat Takluder, Kevin Olofosson
  * @since 2018-01-24
  *
  */
@@ -83,7 +83,7 @@ public class MetadataToExcelGUI{
 		//fileList = new ArrayList<File>();
 		//testMeth();
 	} 
-	
+
 
 	/**
 	 * Name of source folder instantiated and
@@ -94,12 +94,12 @@ public class MetadataToExcelGUI{
 	 * @throws TranscoderException 
 	 */
 	public void init(boolean mapp, boolean overW) throws IOException{
-		
+
 		this.mapping = mapp;
 		this.overwrite = overW;
-		
+
 		docCon = new DocumentConverter();
-		
+
 		folderName = new File(sourceFolderPath).getName();
 
 
@@ -112,32 +112,32 @@ public class MetadataToExcelGUI{
 		//deleteOfficeFiles(sourceFolderPath);
 		//img.convertImage(sourceFolderPath);
 		//deleteIllegalImageFiles(sourceFolderPath);
-		
+
 		listOfFilesAndDirectory(sourceFolderPath);
-		
+
 		closeLibreOffice();
 		deleteOfficeFiles();
-		
+
 		getAndAddFileDataToList();
 		//getAndAddFileDataToList();
-		
+
 	}
-	
-	
+
+
 	/**
 	 * 
 	 * @param officePath
 	 */
 	public void deleteOfficeFiles() 
 	{
-		
+
 		for(File f : docCon.getOriginalListFile()) 
 		{
 			docCon.removeMsOfficeFormatFile(f);
 		}
 		docCon.getOriginalListFile().clear();
 	}
-	
+
 	/**
 	 * 
 	 * @param imagePath
@@ -163,8 +163,8 @@ public class MetadataToExcelGUI{
 		} 
 
 	} 
-	
-	
+
+
 	/**
 	 * 
 	 */
@@ -193,10 +193,10 @@ public class MetadataToExcelGUI{
 		mappedFiles.clear();
 
 	}
-	
-	
+
+
 	/**
-	 * listOfFilesAndDirectory method goes throw files in a folder and sub-folder.
+	 * listOfFilesAndDirectory method goes throw files in a folder and sub-folder and adds those files to a file arraylist. 
 	 * @param inputFolder
 	 * @throws IOException
 	 */
@@ -206,8 +206,6 @@ public class MetadataToExcelGUI{
 	 */
 	private void listOfFilesAndDirectory(String inputFolder) throws IOException {
 		File folder = new File(inputFolder);
-		File tempFile = null;
-		
 
 		for(File currentFileOrDir : folder.listFiles())
 		{
@@ -215,10 +213,10 @@ public class MetadataToExcelGUI{
 			if(currentFileOrDir.isFile())
 			{
 				//tempFile = new File(currentFileOrDir.getAbsolutePath());
-				
+
 				currentFileOrDir = fileStatmentChecker(currentFileOrDir);
-				
-				
+
+
 				fileList.add(currentFileOrDir);
 				System.out.println("Current File : "  + currentFileOrDir.getName());
 				System.out.println("Nr " + fileCount + " : " + currentFileOrDir.getName());
@@ -228,7 +226,7 @@ public class MetadataToExcelGUI{
 			else if(currentFileOrDir.isDirectory())	
 			{
 				//tempFile = new File(currentFileOrDir.getAbsolutePath());
-				
+
 				if(mapping)
 				{
 					currentFileOrDir = doMapping(currentFileOrDir,true);
@@ -243,8 +241,12 @@ public class MetadataToExcelGUI{
 		}
 
 	}
-	
-	
+
+	/**
+	 * This class needs shrimp down a bit so it can be more readable. There are many unnecessary codes/variables so I will look <br> 
+	 * into that and make some changes.
+	 */
+
 	/**
 	 * 
 	 * @param currentFileOrDir
@@ -252,36 +254,44 @@ public class MetadataToExcelGUI{
 	 * @throws IOException
 	 * 
 	 */
-	private File fileStatmentChecker(File currentFileOrDir) throws IOException {
-		
-		if(checkForImageFile(currentFileOrDir))
-		{
-			currentFileOrDir = new File(img.convertImage1(currentFileOrDir).getAbsolutePath());	
-		}
-				
-		if(checkForMsOfficeFiles(currentFileOrDir))
-		{
-			currentFileOrDir = new File(docCon.traverseAndConvert1(currentFileOrDir).getAbsolutePath());
-		}
-		
+	private File fileStatmentChecker(File currentFile) throws IOException {
+
+
 		if(mapping)
 		{
-			currentFileOrDir = doMapping(currentFileOrDir,false);
+			currentFile = doMapping(currentFile,false);
+		}
+		else
+		{
+			currentFile = imgAndMsOfficeFileChecker(currentFile);
+		}
+
+		return currentFile;
+	}
+	
+	private File imgAndMsOfficeFileChecker(File currentFile) throws IOException
+	{
+		if(checkForImageFile(currentFile))
+		{
+			currentFile = new File(img.convertImage1(currentFile).getAbsolutePath());	
+		}
+		else if(checkForMsOfficeFiles(currentFile))
+		{
+			currentFile = new File(docCon.traverseAndConvert1(currentFile).getAbsolutePath());
 		}
 		
-		
-		return currentFileOrDir;
+		return currentFile;
 	}
-
+	
 	private boolean checkForMsOfficeFiles(File currentFileOrDir) {
-		
+
 		if(currentFileOrDir.getName().endsWith(".doc") || currentFileOrDir.getName().endsWith(".docx") || 
 				currentFileOrDir.getName().endsWith(".xls") || currentFileOrDir.getName().endsWith(".xlsx") ||
 				currentFileOrDir.getName().endsWith(".ppt") || currentFileOrDir.getName().endsWith(".pptx")) 
 		{
 			return true;
 		}
-		
+
 		return false;
 	}
 
@@ -290,8 +300,9 @@ public class MetadataToExcelGUI{
 	 * @param currFileOrDir
 	 * @param isDir
 	 * @return
+	 * @throws IOException 
 	 */
-	public File doMapping(File currFileOrDir, boolean isDir) {
+	public File doMapping(File currFileOrDir, boolean isDir) throws IOException {
 
 		File tempFile = null;
 		String currFile = "";//replaceIllegalChars(currFileOrDir.getName());
@@ -306,11 +317,15 @@ public class MetadataToExcelGUI{
 			else
 			{	
 				illegalCharFiles.add(currFileOrDir.getName());
+				
+				currFileOrDir = imgAndMsOfficeFileChecker(currFileOrDir);
 			}
-
+			
+			
 			currFile = replaceIllegalChars(currFileOrDir.getName());
+			
 			tempFile = new File(currFileOrDir.getParentFile().getAbsolutePath(), currFile);
-
+			
 			checkForFileOrDirAndSeparateWithExt(isDir,tempFile);
 
 			if(tempFile.exists()) {
@@ -329,6 +344,8 @@ public class MetadataToExcelGUI{
 		}
 		else
 		{
+			currFileOrDir = imgAndMsOfficeFileChecker(currFileOrDir);
+			
 			tempFile = currFileOrDir;
 		}
 
@@ -337,7 +354,7 @@ public class MetadataToExcelGUI{
 		return tempFile;
 
 	}
-	
+
 	/**
 	 * 
 	 * @param currentString
@@ -346,13 +363,13 @@ public class MetadataToExcelGUI{
 	//If String contains illegal characters they will be replaced and returned.
 	private String replaceIllegalChars(String currentString) {
 
-		currentString = StringUtils.replaceEach (currentString, 
+		return currentString = StringUtils.replaceEach(currentString, 
 				new String[] { "å",  "ä",  "ö",  "ü", "Å",  "Ä",  "Ö", "Ü", " "}, 
 				new String[] {"aa", "ae", "oe", "ue","AA", "AE", "OE", "UE", "_"});
 
-		return currentString;
+		 //currentString;
 	}
-	
+
 	/**
 	 * 
 	 * @param isDir
@@ -370,7 +387,7 @@ public class MetadataToExcelGUI{
 			fileNameWithOutExt = tempFile.getName();
 		}
 	}
-	
+
 	/**
 	 * 
 	 * @param tempFile
@@ -382,33 +399,15 @@ public class MetadataToExcelGUI{
 		if(!isDir)
 		{
 			tempFile = new File(currFileOrDir.getParentFile().getAbsolutePath(), fileNameWithOutExt + "_" + counter + "." + fileExtension);
-
 		}
 		else
 		{
 			tempFile = new File(currFileOrDir.getParentFile().getAbsolutePath(), fileNameWithOutExt + "_" + counter);
-
 		}
 
 		return tempFile;
 	}
-		
-	/*
-	 * It's Tuesday and I'm still tired. I don't feel like to code and I'm booked for meeting tomorrow with two coworkers.
-	 * I have to give demo to them about what I have done until now and then also what plans is. What I want to do after I'm done with this project.
-	 * So I have to prepare for tomorrow.
-	 *  
-	 * 13:29 - What is my plan for today? Not much, I have shrinked the the listOfFiles func and organized the model package to sub model packages. It is much 
-	 * more easier to read.    
-	 * 
-	 * 13:40 - When will you leave the office? I will leave the office around 15.00. 
-	 * 
-	 * 13:53 - What will you do when you arrive home? I don't really know, maybe sleep for few hours to recover sleep hours that I have missed. I feel so down when I don't get enough hours of sleep.
-	 * It feels so good that I don't work today at Posten. 
-	 *  
-	 */
-	
-	
+
 	/**
 	 * This boolean method checks if a name of file/folder contains illegal character outside of English characters and return true or false depending
 	 * on if illegal character contains on name or not.   
@@ -429,8 +428,7 @@ public class MetadataToExcelGUI{
 		}
 
 	}
-	
-	
+
 	/*
 	 * If fileList is not empty:  
 	 * 
@@ -459,8 +457,6 @@ public class MetadataToExcelGUI{
 				for(File file : fileList)
 				{
 
-
-
 					fullPathforCurrentFile = file.getAbsolutePath();
 					getDecoding = null;
 					if(file.getName().endsWith(".html") || file.getName().endsWith(".xhtml") || file.getName().endsWith(".xml")
@@ -482,8 +478,6 @@ public class MetadataToExcelGUI{
 					fileSize = file.length();
 					fPath = file.getParentFile().getAbsolutePath();
 					fPath = fPath.replace(sourceFolderPath, folderName);
-
-
 
 					if(getDecoding == null)
 					{
@@ -525,9 +519,9 @@ public class MetadataToExcelGUI{
 		} catch (IOException e) {
 			e.printStackTrace();
 		} 
-		
+
 	}
-	
+
 	/**
 	 * 
 	 * @param file
@@ -535,9 +529,9 @@ public class MetadataToExcelGUI{
 	 */
 	private void changeLinkInFile(File file) throws IOException {
 
-		if(file.getName().endsWith(".html") || file.getName().endsWith(".css") || file.getName().endsWith(".js"))
+		if(file.getName().endsWith(".html") || file.getName().endsWith(".css")/* || file.getName().endsWith(".js")*/)
 		{
-			
+
 			String fileExt = FilenameUtils.getExtension(file.getName());
 			List<String> list = new ArrayList<String>();
 			FileExtension ext;
@@ -547,30 +541,27 @@ public class MetadataToExcelGUI{
 
 			for(File s : mappedFiles) 
 			{
-				if(!s.isDirectory())
+				ext = new FileExtension(s.getName());
+
+				if(ext.getHtmlCssFileExtension()) 
 				{
-					ext = new FileExtension(s.getName());
+					br.updateInfoInFile(illegalCharFiles.get(counter), s.getName(), list, fileExt) ;
+				}
 
-					if(ext.getHtmlCssFileExtension()) 
-					{
-						br.updateInfoInFile(illegalCharFiles.get(counter), s.getName(), list, fileExt) ;
-					}
-
-					if(ext.getJsImgFileExtension())
-					{
-						br.updateInfoInFile(illegalCharFiles.get(counter), s.getName(), list, fileExt);
-
-					}
+				if(ext.getJsImgFileExtension())
+				{
+					br.updateInfoInFile(illegalCharFiles.get(counter), s.getName(), list, fileExt);
 
 				}
+
 				counter++;
-				
+
 			}
 			list.clear();
 		}
 
 	}
-	
+
 	/**
 	 * 
 	 * @param fullPathforCurrentFile
@@ -585,21 +576,21 @@ public class MetadataToExcelGUI{
 
 		return charsetForfile;
 	}
-	
-	
+
+
 	private boolean checkForImageFile(File f)
 	{
-		
+
 		/*String currfilePath = f.getParentFile().getAbsolutePath() + "/"+ f.getName();
 		String fileType = checkVideoAudioFiles(currfilePath).replaceAll("/.*", "");*/
-		
+
 		//System.out.println("Filetype : " + fileType);
-		
+
 		/*if(fileType.equals("image"))
 		{
 			return true;
 		}*/
-		
+
 		if(f.getName().endsWith(".gif") || f.getName().endsWith(".GIF") || 
 				f.getName().endsWith(".jpg") || f.getName().endsWith(".JPG") ||
 				f.getName().endsWith(".bmp") || f.getName().endsWith(".BMP") || 
@@ -609,10 +600,10 @@ public class MetadataToExcelGUI{
 
 			return true;
 		}
-		
+
 		return false;
 	}
-	
+
 	/**
 	 * 
 	 * @param currentfile
@@ -663,7 +654,7 @@ public class MetadataToExcelGUI{
 			}});
 
 	}
-	
+
 	/**
 	 * 
 	 * @param fileType
@@ -673,8 +664,8 @@ public class MetadataToExcelGUI{
 	private String checkVideoAudioFiles(String fileType) {
 		return this.fileType.detect(fileType);
 	}
-	
-	
+
+
 	/**
 	 * 
 	 * @param stringList
@@ -697,7 +688,7 @@ public class MetadataToExcelGUI{
 
 		return index;
 	}
-	
+
 	/**
 	 * 
 	 */
@@ -706,7 +697,7 @@ public class MetadataToExcelGUI{
 		Runtime rt = Runtime.getRuntime();
 		String libreOfficeApp = "LibreOffice.app";
 		String  osName;
-		
+
 		try 
 
 		{
@@ -730,11 +721,11 @@ public class MetadataToExcelGUI{
 			e.printStackTrace();
 
 		} 
-		
-		
+
+
 	}
 
-	
+
 	public String getFolderName() {
 		return folderName;
 	}

@@ -74,9 +74,9 @@ public class JsoupParser {
 	
 	
 	
-	private void tdd()
-	{
-	/*public static void main(String args[])
+	/*private void tdd()
+	
+	public static void main(String args[])
 	{
 		String linkLine = "<a href=\"Å.doc\">Å.doc</a>";
 		
@@ -96,13 +96,11 @@ public class JsoupParser {
 			System.out.println(new TestJsoup().jSoupExtractElementsFromHtmlFile(s, "Å.doc", "A.doc"));
 		}*/
 		
-		/*System.out.println(new TestJsoup().jSoupExtractElementsFromHtmlFile(linkLine, "Å.doc", "A.pdf"));
-		System.out.println(new TestJsoup().jSoupExtractElementsFromHtmlFile(scriptLine, "jävascript.js", "jaevascript.js"));
-		System.out.println(new TestJsoup().jSoupExtractElementsFromHtmlFile(imgLine, "gäphy.gif", "gaephy.png"));
-		System.out.println(new TestJsoup().jSoupExtractElementsFromHtmlFile(cssLine, "äää.css", "aeaeae.css"));
+	/*	System.out.println(new JsoupParser().jSoupExtractElementsFromHtmlFile(linkLine, "Å.doc", "A.pdf"));
+		System.out.println(new JsoupParser().jSoupExtractElementsFromHtmlFile(scriptLine, "jävascript.js", "jaevascript.js"));
+		System.out.println(new JsoupParser().jSoupExtractElementsFromHtmlFile(imgLine, "gäphy.gif", "gaephy.png"));
+		System.out.println(new JsoupParser().jSoupExtractElementsFromHtmlFile(cssLine, "äää.css", "aeaeae.css"));
 		
 		
 	}*/
-	}
-	
 }
