@@ -17,7 +17,6 @@ public class TestMain {
 		
 		/*String uri = tmpFile.toPath().getParent().toUri().toString();
 		String url = tmpFile.getParentFile().getAbsolutePath();
-		
 		System.out.println(uri);
 		System.out.println(url);
 		
@@ -30,7 +29,10 @@ public class TestMain {
 		//System.out.println(new TestMain().checkForImageFile(tmpFile));
 		
 		
-		System.out.println(new TestMain().fileType.detect(tmpFile));
+		//System.out.println(new TestMain().fileType.detect(tmpFile));
+		
+		
+		
 	}
 	
 	

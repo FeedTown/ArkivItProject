@@ -26,6 +26,7 @@ import com.arkivit.view.SecondScene;
 import com.arkivit.view.FirstScene;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
@@ -37,8 +38,11 @@ import javafx.stage.Stage;
 
 /**
  * 
+ * 
+ * Class that connects the model with the view and also handles the events from buttons and other similar stuff.
+ * 
  * @author Kevin Olofsson, Roberto Blanco, Saikat Talukder
- * Class that connects the model with the view
+ * @since 2018-07-27
  *
  */
 public class ExcelControllerFX extends Application {
@@ -95,6 +99,7 @@ public class ExcelControllerFX extends Application {
 		this.stage = primaryStage;
 		stage.setScene(firstScene.getFirstScene());
 		stage.show();
+		stage.setOnCloseRequest(e -> Runtime.getRuntime().exit(0));
 		firstScene.addActionListenerForButton(new ActionListen());
 		secondScene.addActionListenerForButton(new ActionListen());
 
@@ -486,13 +491,19 @@ public class ExcelControllerFX extends Application {
 
 		});
 
-
 		//Start Thread
 		//System.out.println("Thread was not alive.");
 		loadingThread = new Thread(progressTask);
 		loadingThread.start();
-		//startThread(progressTask);
-
+		
+	}
+	
+	public void setPathLibOfficeButton(ActionEvent event, Stage stage) {
+		
+		File selectedDir = secondScene.getfileChooser().showOpenDialog(stage);
+		String path = selectedDir.getAbsolutePath();
+		model.setLibOfficePath(path);
+		secondScene.getSetLibreOfficePathField().setText(path);
 	}
 
 	private Task<?> getProgress() {
@@ -521,11 +532,11 @@ public class ExcelControllerFX extends Application {
 				//secondScene.getPb().setVisible(true);
 				//Thread.sleep(200);
 
-				for (int i = 0; i < model.getFileListeLength(); i++) {
+				/*for (int i = 0; i < model.getFileListeLength(); i++) {
 					// updateMessage("2000 milliseconds");
 					Thread.sleep(20);
 					updateProgress(i + 1,model.getFileListeLength());
-				}
+				}*/
 
 				return true;
 			}
@@ -563,6 +574,10 @@ public class ExcelControllerFX extends Application {
 
 				}*/
 			}
+			if(event.getSource().equals(secondScene.getBtnSetPathLibOffice()))
+			{
+				setPathLibOfficeButton(event, stage);
+			}
 			if(event.getSource().equals(secondScene.getBtnOpenFile()))
 			{
 				openButton(event, stage);
@@ -574,7 +589,6 @@ public class ExcelControllerFX extends Application {
 			else if(event.getSource().equals(secondScene.getBtnConvert()))
 			{
 				createButton(event);
-
 			}
 			else if(event.getSource().equals(secondScene.getBtnBack())){
 				stage.setScene(firstScene.getFirstScene());
@@ -587,7 +601,6 @@ public class ExcelControllerFX extends Application {
 			}
 			else if(event.getSource().equals(secondScene.getBtnOverwrite())) {
 				overwriteButton(event, stage);
-
 			}
 			else if(event.getSource().equals(secondScene.getBtnDelete())) {
 				deleteButton(event);
@@ -609,7 +622,7 @@ public class ExcelControllerFX extends Application {
 	}
 
 	//DB-management disabled because server is down.
-	public void hibernateSession()  {
+	public void hibernateSession() {
 
 		/*
 		 * Radera alla rader och nollställ auto increment: truncate ArkivIT.webbleveranser

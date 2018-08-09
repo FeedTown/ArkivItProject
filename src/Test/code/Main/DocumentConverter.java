@@ -1,4 +1,4 @@
-package com.arkivit.model.converters;
+package Test.code.Main;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,15 +17,6 @@ import com.sun.star.uno.XComponentContext;
 import com.sun.star.util.XCloseable;
 
 import ooo.connector.BootstrapSocketConnector;
-
-/**
- * 
- * This class converts all office document files to PDF/A with the help of LibreOffice program. This class source code is taken from <br>
- * LibreOffice website.
- * 
- * @author Saikat Talukder
- * @since 2018-08-07
- */
 
 public class DocumentConverter {
 
@@ -62,7 +53,6 @@ public class DocumentConverter {
 	
 	public DocumentConverter(String libOfficePath)
 	{	
-		
 		this.libOfficePath = libOfficePath;
 		libreOfficeConnectionMethod();
 	}

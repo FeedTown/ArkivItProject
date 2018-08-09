@@ -8,7 +8,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -199,8 +198,6 @@ public class ImageFileConverter {
 	}
 
 
-	
-	
 	private void oldCodes()
 	{
 		/*public void storeOriginalImages(ArrayList<File> file) throws IOException {

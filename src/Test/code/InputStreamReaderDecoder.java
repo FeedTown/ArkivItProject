@@ -1,4 +1,4 @@
-package com.arkivit.model;
+package Test.code;
 
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
@@ -38,7 +38,7 @@ public class InputStreamReaderDecoder {
 			//System.out.print("The stream is already closed");
 		} finally {
 
-			// closes the stream and releases resources associated
+			//Closes the stream and releases resources associated
 			try {
 				if(fileInputStream!=null)
 					fileInputStream.close();

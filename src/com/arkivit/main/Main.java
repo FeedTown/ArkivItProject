@@ -25,7 +25,6 @@ public class Main {
 		
 		ExcelControllerFX.launch(controllerFx.getClass(),args);
 		
-
 	}
 
 }

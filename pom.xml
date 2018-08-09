@@ -5,67 +5,161 @@
 	<artifactId>TestProjeckt</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<dependencies>
+		<!-- https://mvnrepository.com/artifact/org.codehaus.groovy/groovy-all -->
+		<!-- For charset, its not in use atm -->
+	
+		
+		<!-- PDF validator -->
+		<dependency>
+			<groupId>org.verapdf</groupId>
+			<artifactId>validation-model</artifactId>
+			<version>1.4.5</version>
+		</dependency>
+		<!-- 
+		################1###############
 		<dependency>
 			<groupId>args4j</groupId>
 			<artifactId>args4j</artifactId>
 			<version>2.32</version>
 		</dependency>
+		################2###############
 		<dependency>
 			<groupId>org.docx4j</groupId>
 			<artifactId>docx4j</artifactId>
 			<version>3.2.2</version>
 		</dependency>
-		<dependency>
-			<groupId>org.apache.poi</groupId>
-			<artifactId>poi-ooxml</artifactId>
-			<version>3.17</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.poi</groupId>
-			<artifactId>poi-ooxml-schemas</artifactId>
-			<version>3.12</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.poi</groupId>
-			<artifactId>poi-scratchpad</artifactId>
-			<version>3.12</version>
-		</dependency>
+		################3###############
 		<dependency>
 			<groupId>fr.opensagres.xdocreport</groupId>
 			<artifactId>org.apache.poi.xwpf.converter.pdf</artifactId>
 			<version>1.0.5</version>
 		</dependency>
+		################4###############
 		<dependency>
 			<groupId>com.itextpdf</groupId>
 			<artifactId>itextpdf</artifactId>
 			<version>5.5.6</version>
 		</dependency>
+		################5###############
 		<dependency>
 			<groupId>fr.opensagres.xdocreport</groupId>
 			<artifactId>org.odftoolkit.odfdom.converter.pdf</artifactId>
 			<version>1.0.5</version>
 		</dependency>
+		################6###############
 		<dependency>
 			<groupId>fr.opensagres.xdocreport</groupId>
 			<artifactId>fr.opensagres.xdocreport.itext.extension</artifactId>
 			<version>1.0.5</version>
 		</dependency>
+		################7###############
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-scratchpad</artifactId>
+			<version>3.12</version>
+		</dependency>
+		################8###############
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml-schemas</artifactId>
+			<version>3.12</version>
+		</dependency>
+		################9###############
 		<dependency>
 			<groupId>net.sourceforge.jexcelapi</groupId>
 			<artifactId>jxl</artifactId>
 			<version>2.6.12</version>
 		</dependency>
+		################10###############
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.7.22</version>
+		</dependency>
+		################11###############
+		<dependency>
+			<groupId>fr.opensagres.xdocreport</groupId>
+			<artifactId>org.apache.poi.xwpf.converter.pdf</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		###############12###############
+		<dependency>
+			<groupId>org.docx4j</groupId>
+			<artifactId>docx4j</artifactId>
+			<version>2.8.1</version>
+		</dependency>
+		###############13###############
+		<dependency>
+			<groupId>org.openoffice</groupId>
+			<artifactId>juh</artifactId>
+			<version>4.1.2</version>
+		</dependency>
+		###############14###############
+		<dependency>
+			<groupId>org.libreoffice</groupId>
+			<artifactId>unoil</artifactId>
+			<version>5.4.2</version>
+		</dependency>
+		###############15###############
+		<dependency>
+			<groupId>org.apache.xmlgraphics</groupId>
+			<artifactId>xmlgraphics-commons</artifactId>
+			<version>2.1</version>
+		</dependency>
+		###############16###############
+		<dependency>
+			<groupId>org.apache.xmlgraphics</groupId>
+			<artifactId>batik-codec</artifactId>
+			<version>1.7</version>
+		</dependency>
+		###############17###############
+		<dependency>
+			<groupId>org.apache.xmlgraphics</groupId>
+			<artifactId>batik-codec</artifactId>
+			<version>1.9</version>
+		</dependency>
+		###############18###############
+		<dependency>
+			<groupId>com.github.albfernandez</groupId>
+			<artifactId>juniversalchardet</artifactId>
+			<version>2.1.0</version>
+		</dependency>
+		###############19###############
+		Charset Detector
+		<dependency>
+			<groupId>org.codehaus.groovy</groupId>
+			<artifactId>groovy-all</artifactId>
+			<version>2.5.0</version>
+			<type>pom</type>
+		</dependency>
+		
+		 -->
+		 <dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.7.22</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.apache.xmlgraphics</groupId>
+			<artifactId>batik-codec</artifactId>
+			<version>1.7</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>3.17</version>
+		</dependency>
+		
+		
 		<!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
 			<version>2.6</version>
 		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
-			<version>1.7.22</version>
-		</dependency>
+	
 		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
@@ -89,18 +183,7 @@
 			<artifactId>commons-cli</artifactId>
 			<version>1.4</version>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/fr.opensagres.xdocreport/org.apache.poi.xwpf.converter.pdf -->
-		<dependency>
-			<groupId>fr.opensagres.xdocreport</groupId>
-			<artifactId>org.apache.poi.xwpf.converter.pdf</artifactId>
-			<version>1.0.0</version>
-		</dependency>
-		<!-- docx4j -->
-		<dependency>
-			<groupId>org.docx4j</groupId>
-			<artifactId>docx4j</artifactId>
-			<version>2.8.1</version>
-		</dependency>
+		
 		<!-- https://mvnrepository.com/artifact/org.jclarion/image4j -->
 		<dependency>
 			<groupId>org.jclarion</groupId>
@@ -119,53 +202,26 @@
 			<artifactId>commons-collections4</artifactId>
 			<version>4.1</version>
 		</dependency>
-		<dependency>
-			<groupId>org.openoffice</groupId>
-			<artifactId>juh</artifactId>
-			<version>4.1.2</version>
-		</dependency>
+		
 		<dependency>
 			<groupId>org.openoffice</groupId>
 			<artifactId>bootstrap-connector</artifactId>
 			<version>0.1.1</version>
 		</dependency>
-		<dependency>
-			<groupId>org.libreoffice</groupId>
-			<artifactId>unoil</artifactId>
-			<version>5.4.2</version>
-		</dependency>
+		
 		<!-- https://mvnrepository.com/artifact/org.apache.xmlgraphics/batik-transcoder -->
 		<dependency>
 			<groupId>org.apache.xmlgraphics</groupId>
 			<artifactId>batik-transcoder</artifactId>
 			<version>1.7</version>
 		</dependency>
-		<dependency>
-			<groupId>org.apache.xmlgraphics</groupId>
-			<artifactId>batik-codec</artifactId>
-			<version>1.7</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.xmlgraphics</groupId>
-			<artifactId>xmlgraphics-commons</artifactId>
-			<version>2.1</version>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.apache.xmlgraphics/batik-transcoder -->
-		<dependency>
-			<groupId>org.apache.xmlgraphics</groupId>
-			<artifactId>batik-codec</artifactId>
-			<version>1.9</version>
-		</dependency>
-		<!-- Database dependencies -->
+		
 		<!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
 			<version>5.1.33</version>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.hibernate/hibernate-core -->
-		<!-- https://mvnrepository.com/artifact/org.hibernate/hibernate-core -->
-		<!-- https://mvnrepository.com/artifact/org.hibernate/hibernate-core -->
 		<!-- https://mvnrepository.com/artifact/org.hibernate/hibernate-core -->
 		<dependency>
 			<groupId>org.hibernate</groupId>

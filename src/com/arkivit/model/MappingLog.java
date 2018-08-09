@@ -62,8 +62,12 @@ public class MappingLog {
 
 
 				String path ="";
-				getLog(model.getMappedFiles(), model.getIllegalCharFiles(),logger, "Original file:","Mapped file:");
-				getLog(model.getMappedFolder(), model.getIllegarCharFolders(),logger , "Original folder:","Mapped folder:");
+				getLog(model.getMappedFiles(), model.getIllegalCharFiles(),logger, "Original file: ","Mapped file: ");
+				getLog(model.getMappedFolder(), model.getIllegarCharFolders(),logger , "Original folder: ","Mapped folder: ");
+				getLog1(model.getValidPdfAList(), logger, "Valid PDF/A Files : ");
+				getLog1(model.getUnvalidPdfAList(), logger, "Unvalid PDF/A Files : ");
+				
+				
 
 
 				/*for(File mappedTemp: model.getMappedFiles()) 
@@ -132,6 +136,21 @@ public class MappingLog {
 					orgName + " "+ charIllegalList.get(count)+ "\n");
 
 			count++;
+		} 
+
+
+	}
+	
+	private void getLog1(ArrayList<String> charMappedList, Logger log, String mappedName) {
+		
+		for(String mappedTemp: charMappedList) 
+		{
+			//Path for mapped files
+			//path = mappedTemp.getParentFile().getAbsolutePath();
+			//path = path.replace(model.getSourceFolderPath(), model.getFolderName());
+
+
+			log.info("\n "+ mappedName+ " " + mappedTemp + "\n");
 		} 
 
 

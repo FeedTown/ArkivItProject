@@ -12,6 +12,14 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.tika.Tika;
+import org.verapdf.core.EncryptedPdfException;
+import org.verapdf.core.ModelParsingException;
+import org.verapdf.core.ValidationException;
+import org.verapdf.pdfa.Foundries;
+import org.verapdf.pdfa.PDFAParser;
+import org.verapdf.pdfa.PDFAValidator;
+import org.verapdf.pdfa.VeraGreenfieldFoundryProvider;
+import org.verapdf.pdfa.results.ValidationResult;
 
 import com.arkivit.model.converters.DocumentConverter;
 import com.arkivit.model.converters.ImageFileConverter;
@@ -24,22 +32,24 @@ import com.arkivit.view.FirstScene;
 
 
 /**
- * This class is handling the process of sending data and importing metadata
+ * This class is handling the process of sending data and importing metadata from files
  * to two excel sheets.
  * 
  * @author Roberto Blanco, Saikat Takluder, Kevin Olofosson
- * @since 2018-01-24
+ * @since 2018-07-24
  *
  */
 public class MetadataToExcelGUI{
 
-	private String excelFileName, folderName = "", confidentialChecked = "", personalDataChecked = "";  
+	private String excelFileName, folderName = "", confidentialChecked = "", personalDataChecked = "", libOfficePath;  
 	private long fileSize;
 	private int fileListeLength, counter = 1;
 	private String sourceFolderPath, targetexcelFilepath, backupFilePath, fileExtension = "", fileNameWithOutExt = "";
 	private ArrayList<String> fileNameList = new ArrayList<String>();
 	private ArrayList<String> filePathList = new ArrayList<String>();
-	private ArrayList<String> fileDecodeList = new ArrayList<String>();
+	private ArrayList<String> fileDecodeList = new ArrayList<String>(), 
+							  validPdfAList = new ArrayList<String>(), 
+							  unvalidPdfAList = new ArrayList<String>();
 	private ArrayList<Long> sizeList = new ArrayList<Long>();
 	private ArrayList<File> fileList = new ArrayList<File>();
 	private ArrayList<File> mappedFiles = new ArrayList<File>(), mappedFolder = new ArrayList<File>();
@@ -78,12 +88,10 @@ public class MetadataToExcelGUI{
 	 */
 	public MetadataToExcelGUI(String excelFileName)
 	{   
-
 		this.excelFileName = excelFileName + ".xlsx";
 		//fileList = new ArrayList<File>();
 		//testMeth();
 	} 
-
 
 	/**
 	 * Name of source folder instantiated and
@@ -98,10 +106,9 @@ public class MetadataToExcelGUI{
 		this.mapping = mapp;
 		this.overwrite = overW;
 
-		docCon = new DocumentConverter();
-
+		docCon = new DocumentConverter(libOfficePath);
+		
 		folderName = new File(sourceFolderPath).getName();
-
 
 		if(mapping && !overwrite) 
 		{
@@ -117,7 +124,15 @@ public class MetadataToExcelGUI{
 
 		closeLibreOffice();
 		deleteOfficeFiles();
-
+		
+		for(File f : fileList)
+		{
+			if(f.getName().endsWith(".pdf"))
+			{
+				validatePdf1abFile(f);
+			}
+		}
+		
 		getAndAddFileDataToList();
 		//getAndAddFileDataToList();
 
@@ -193,7 +208,43 @@ public class MetadataToExcelGUI{
 		mappedFiles.clear();
 
 	}
-
+	
+	private void validatePdf1abFile(File file)
+	{
+		
+		VeraGreenfieldFoundryProvider.initialise();
+		
+		try (PDFAParser parser = Foundries.defaultInstance().createParser(file)) {
+		    PDFAValidator validator = Foundries.defaultInstance().createValidator(parser.getFlavour(), false);
+		    ValidationResult result = validator.validate(parser);
+		    if (result.isCompliant()) {
+		      // File is a valid PDF/A 1b
+		    	String validPdfAFile = "This PDF file, "+ file.getName() +" is a valid PDF/A 1b";	    	
+		    	validPdfAList.add(file.getName());
+		    	
+		    	System.out.println(validPdfAFile);
+		    	
+		    } else {
+		    	String unvalidPdfAFile = "This PDF file, "+ file.getName() +" is not a valid PDF/A 1b";	    	
+		    	unvalidPdfAList.add(file.getName());
+		    	
+		    	System.out.println(unvalidPdfAFile);
+		    	
+		    }
+		} catch (ModelParsingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (EncryptedPdfException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ValidationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 	/**
 	 * listOfFilesAndDirectory method goes throw files in a folder and sub-folder and adds those files to a file arraylist. 
@@ -243,19 +294,14 @@ public class MetadataToExcelGUI{
 	}
 
 	/**
-	 * This class needs shrimp down a bit so it can be more readable. There are many unnecessary codes/variables so I will look <br> 
-	 * into that and make some changes.
-	 */
-
-	/**
 	 * 
 	 * @param currentFileOrDir
 	 * @return
 	 * @throws IOException
 	 * 
 	 */
-	private File fileStatmentChecker(File currentFile) throws IOException {
-
+	private File fileStatmentChecker(File currentFile) throws IOException 
+	{
 
 		if(mapping)
 		{
@@ -328,7 +374,8 @@ public class MetadataToExcelGUI{
 			
 			checkForFileOrDirAndSeparateWithExt(isDir,tempFile);
 
-			if(tempFile.exists()) {
+			if(tempFile.exists()) 
+			{
 
 				tempFile = renameFile(tempFile,isDir,currFileOrDir);
 			}
@@ -356,6 +403,7 @@ public class MetadataToExcelGUI{
 	}
 
 	/**
+	 * This method takes a string as parameter and then the string changes inside this method <br> 
 	 * 
 	 * @param currentString
 	 * @return
@@ -387,7 +435,7 @@ public class MetadataToExcelGUI{
 			fileNameWithOutExt = tempFile.getName();
 		}
 	}
-
+	
 	/**
 	 * 
 	 * @param tempFile
@@ -471,7 +519,6 @@ public class MetadataToExcelGUI{
 					{
 						changeLinkInFile(file);
 					}
-
 
 					checkForAudioVideoDuration(file);
 
@@ -577,7 +624,6 @@ public class MetadataToExcelGUI{
 		return charsetForfile;
 	}
 
-
 	private boolean checkForImageFile(File f)
 	{
 
@@ -617,7 +663,6 @@ public class MetadataToExcelGUI{
 		tempPath = currentfile.getParentFile().getAbsolutePath() + "/"+ currentFileName;
 		tempString = checkVideoAudioFiles(tempPath);
 		newFileString = tempString.replaceAll(".*/", "");
-
 
 		if(tempString.equals("video/"+newFileString) || tempString.equals("audio/"+newFileString))
 		{
@@ -725,6 +770,14 @@ public class MetadataToExcelGUI{
 
 	}
 
+
+	public ArrayList<String> getValidPdfAList() {
+		return validPdfAList;
+	}
+
+	public ArrayList<String> getUnvalidPdfAList() {
+		return unvalidPdfAList;
+	}
 
 	public String getFolderName() {
 		return folderName;
@@ -834,6 +887,15 @@ public class MetadataToExcelGUI{
 
 	public ArrayList<File> getFileList() {
 		return fileList;
+	}
+	
+
+	public String getLibOfficePath() {
+		return libOfficePath;
+	}
+
+	public void setLibOfficePath(String libOfficePath) {
+		this.libOfficePath = libOfficePath;
 	}
 
 	public boolean isLibreOfficeOpen() {
