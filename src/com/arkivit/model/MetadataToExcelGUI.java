@@ -208,7 +208,10 @@ public class MetadataToExcelGUI{
 		mappedFiles.clear();
 
 	}
-	
+	/**
+	 * 
+	 * @param file
+	 */
 	private void validatePdf1abFile(File file)
 	{
 		
