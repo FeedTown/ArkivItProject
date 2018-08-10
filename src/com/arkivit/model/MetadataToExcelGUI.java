@@ -214,7 +214,6 @@ public class MetadataToExcelGUI{
 	 */
 	private void validatePdf1abFile(File file)
 	{
-		
 		VeraGreenfieldFoundryProvider.initialise();
 		
 		try (PDFAParser parser = Foundries.defaultInstance().createParser(file)) {
