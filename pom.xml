@@ -15,6 +15,14 @@
 			<artifactId>validation-model</artifactId>
 			<version>1.4.5</version>
 		</dependency>
+		
+		<!-- https://mvnrepository.com/artifact/org.apache.xmlgraphics/fop -->
+		<dependency>
+    		<groupId>org.apache.xmlgraphics</groupId>
+    		<artifactId>fop</artifactId>
+   			 <version>2.3</version>
+		</dependency>
+		
 		<!-- 
 		################1###############
 		<dependency>

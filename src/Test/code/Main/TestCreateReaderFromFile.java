@@ -1,10 +1,29 @@
 package Test.code.Main;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.xml.transform.Result;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.sax.SAXResult;
+import javax.xml.transform.stream.StreamSource;
+
+//Apache Fop
+import org.apache.fop.apps.FopFactory;
+import org.apache.fop.apps.FOUserAgent;
+import org.apache.fop.apps.Fop;
+import org.apache.fop.apps.MimeConstants;
 
 //VERAPDF GREENFIELD IMORTS
 import org.verapdf.pdfa.VeraGreenfieldFoundryProvider;
@@ -14,6 +33,7 @@ import org.verapdf.core.ValidationException;
 import org.verapdf.pdfa.Foundries;
 import org.verapdf.pdfa.PDFAParser;
 import org.verapdf.pdfa.results.ValidationResult;
+import org.xml.sax.SAXException;
 import org.verapdf.pdfa.PDFAValidator;
 import org.verapdf.pdfa.flavours.PDFAFlavour;
 
@@ -22,66 +42,180 @@ import com.arkivit.model.CharsetDetector;
 //import groovy.util.CharsetToolkit;
 
 public class TestCreateReaderFromFile {
-	
-	private String libreOfficePathWin = "C:/Program Files/LibreOffice/program/soffice.exe", path = "H:\\Skrivbord\\msOfficeFiles";
-	
-	
+
+	private String libreOfficePathWin = "C:/Program Files/LibreOffice/program/", path = "H:\\Skrivbord\\msOfficeFiles";
+	private String pdfFilePath = "H:\\Skrivbord\\Min_Aktivitetsrapport_201710-47051.pdf", path2 = "H:\\Skrivbord\\New_folder\\";
+	private String libreOfficeAppMac = "LibreOffice.app", libreOfficeAppWin = "soffice.bin";
+
+
 	private CharsetDetector checkDecoder = new CharsetDetector();
-	
-	private DocumentConverter docCon = new DocumentConverter(libreOfficePathWin);
+
+	private DocumentConverter docCon;
+
 	private List<File> fileList = new ArrayList<File>();
-	
-	public static void main (String[] args) throws java.io.IOException {
+
+	public static void main (String[] args){
 
 		TestCreateReaderFromFile t = new TestCreateReaderFromFile();
-		
+
 		//t.testMethod();
 		//t.testMethod1();
-		
+
 		t.init();
-		System.out.println("Done!");
-		
-		Runtime.getRuntime().exit(0);
-		
-		
+		//t.delete();
+
 	}
-	
-	public void init() throws IOException
+
+	public void delete()
 	{
-		listOfFilesAndDirectory(path);
+		File file = new File("H:\\Skrivbord\\New_folder\\Min_Aktivitetsrapport_201710-47051.pdf");
+		file.delete();
+	}
+
+	public void init() 
+	{
+		
+		docCon = new DocumentConverter(libreOfficePathWin);
+		CloseLibreOffice cLO = new CloseLibreOffice(docCon);
+		try {
+			listOfFilesAndDirectory(path2);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+
 		closeLibreOffice();
 		deleteOfficeFiles();
-		
+
+		//File newFile = new File(path2);
+
+
+
 		for(File f : fileList)
 		{
-			validatePdf1abFile(f);
+			if(f.getName().endsWith(".pdf"))
+			{
+				/*if(!validatePdf1abFile(f))
+				{*/
+					convertPDFToPDFA(f,cLO);
+				//}
+			}
+
+			//System.out.println("Filename : " + f.getName());
 		}
-		
+
 		System.out.println("Done!");
+
+	}
+
+	@SuppressWarnings("unchecked")
+	private File apacheFop(File pdfFile) throws IOException
+	{
+		File pdfAfile = new File(pdfFile.getParentFile().getAbsolutePath(), "TestPdfa.pdf");
+		OutputStream out = new BufferedOutputStream(new FileOutputStream(pdfAfile));
+		try {
+			// Step 1: Construct a FopFactory
+			// (reuse if you plan to render multiple documents!)
+			FopFactory fopFactory = FopFactory.newInstance(pdfFile);
+
+			// Step 2: Set up output stream.
+			// Note: Using BufferedOutputStream for performance reasons (helpful with FileOutputStreams).
+			//OutputStream out = new BufferedOutputStream(new FileOutputStream(new File("C:/Temp/myfile.pdf")));
+
+			FOUserAgent foUserAgent = fopFactory.newFOUserAgent(); 
+			foUserAgent.getRendererOptions().put("pdf-a-mode","PDF/A-1b");
+
+			// Step 3: Construct fop with desired output format
+			Fop fop = fopFactory.newFop(MimeConstants.MIME_PDF, out);
+
+			// Step 4: Setup JAXP using identity transformer
+			TransformerFactory factory = TransformerFactory.newInstance();
+			Transformer transformer = factory.newTransformer(); // identity transformer
+
+			// Step 5: Setup input and output for XSLT transformation
+			// Setup input stream
+			Source src = new StreamSource(new File("C:/Temp/myfile.fo"));
+
+			// Resulting SAX events (the generated FO) must be piped through to FOP
+			Result res = new SAXResult(fop.getDefaultHandler());
+
+			// Step 6: Start XSLT transformation and FOP processing
+			transformer.transform(src, res);
+
+		} catch (TransformerConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (TransformerException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch(SAXException e){
+
+		} finally {
+			//Clean-up
+			out.close();
+		}
+		return pdfAfile;
+	}
+
+	public void convertPDFToPDFA(File pdfFile, CloseLibreOffice cLO)
+	{
+
+		//File pdfFile = new File(pdfFilePath);
+
+		//pdfFile = new File("H:\\Skrivbord\\msOfficeFiles\\Min_Aktivitetsrapport_201710-47051.pdf");
+
+		File tmpFile = pdfFile;
+
+		pdfFile = docCon.traverseAndConvert1(pdfFile);
+		docCon.getBsc().disconnect();
+		cLO.init();
 		
+		System.out.println(pdfFile.getAbsolutePath());
+
+		File pdfAFile = new File(tmpFile.getAbsolutePath());
+
+		docCon.removeMsOfficeFormatFile(tmpFile);
+		docCon.getOriginalListFile().clear();
+
+		System.out.println("Renamed file works? " + pdfAFile.getAbsolutePath());
+		System.out.println("Original file works? " + pdfFile.getAbsolutePath());
+
+		boolean isRenamed = pdfFile.renameTo(pdfAFile);
+
+		System.out.println("Temp file :" + tmpFile);
+
+		if(isRenamed)
+		{
+			System.out.println("Success!");
+			docCon.removeMsOfficeFormatFile(pdfFile);
+		}else {
+			System.out.println("Fail!");
+		}
+
 	}
 
 	private File fileStatmentChecker(File currentFile) throws IOException 
 	{
 
 		currentFile = imgAndMsOfficeFileChecker(currentFile);
-		
+
 		return currentFile;
 	}
-	
+
 	private File imgAndMsOfficeFileChecker(File currentFile) throws IOException
 	{
 		if(checkForMsOfficeFiles(currentFile))
 		{
 			currentFile = new File(docCon.traverseAndConvert1(currentFile).getAbsolutePath());
 		}
-		
+
 		return currentFile;
 	}
-	
+
 	private boolean checkForMsOfficeFiles(File currentFileOrDir) {
 
-		if(currentFileOrDir.getName().endsWith(".doc") || currentFileOrDir.getName().endsWith(".docx") || 
+		if(/*currentFileOrDir.getName().endsWith(".doc") || currentFileOrDir.getName().endsWith(".docx") || */
 				currentFileOrDir.getName().endsWith(".xls") || currentFileOrDir.getName().endsWith(".xlsx") ||
 				currentFileOrDir.getName().endsWith(".ppt") || currentFileOrDir.getName().endsWith(".pptx")) 
 		{
@@ -90,7 +224,7 @@ public class TestCreateReaderFromFile {
 
 		return false;
 	}
-	
+
 	public void closeLibreOffice() 
 	{
 		Runtime rt = Runtime.getRuntime();
@@ -110,7 +244,7 @@ public class TestCreateReaderFromFile {
 			{
 				rt.exec("pkill -f " + libreOfficeApp);
 			}
-			
+
 
 		} 
 
@@ -123,7 +257,7 @@ public class TestCreateReaderFromFile {
 
 
 	}
-	
+
 	public void deleteOfficeFiles() 
 	{
 
@@ -133,7 +267,7 @@ public class TestCreateReaderFromFile {
 		}
 		docCon.getOriginalListFile().clear();
 	}
-	
+
 	private void listOfFilesAndDirectory(String inputFolder) throws IOException {
 		File folder = new File(inputFolder);
 
@@ -145,7 +279,7 @@ public class TestCreateReaderFromFile {
 				currentFileOrDir = fileStatmentChecker(currentFileOrDir);
 
 				fileList.add(currentFileOrDir);
-				
+
 			}
 			else if(currentFileOrDir.isDirectory())	
 			{
@@ -154,26 +288,31 @@ public class TestCreateReaderFromFile {
 
 				listOfFilesAndDirectory(currentFileOrDir.getAbsolutePath());
 			}
-			
+
 
 		}
 
 	}
-		
-	private void validatePdf1abFile(File file)
+
+	private boolean validatePdf1abFile(File file)
 	{
 		VeraGreenfieldFoundryProvider.initialise();
-		
-		try (PDFAParser parser = Foundries.defaultInstance().createParser(file)) {
-		    PDFAValidator validator = Foundries.defaultInstance().createValidator(parser.getFlavour(), false);
-		    ValidationResult result = validator.validate(parser);
-		    if (result.isCompliant()) {
-		      // File is a valid PDF/A 1b
-		    	System.out.println("This PDF file, "+ file.getName() +" is a valid PDF/A 1b");
-		    	
-		    } else {
-		    	System.out.println("This PDF file, "+ file.getName() +" is not a valid PDF/A 1b");
-		    }
+
+		try {
+			PDFAParser parser = Foundries.defaultInstance().createParser(file);
+			PDFAValidator validator = Foundries.defaultInstance().createValidator(parser.getFlavour(), false);
+			ValidationResult result = validator.validate(parser);
+			if (result.isCompliant()) {
+				// File is a valid PDF/A
+				System.out.println("This PDF file, "+ file.getName() +" is a valid PDF/A");
+				return true;
+
+			} else {
+				System.out.println("This PDF file, "+ file.getName() +" is not a valid PDF/A");
+			}
+			
+			validator.close();
+			parser.close();
 		} catch (ModelParsingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -187,96 +326,98 @@ public class TestCreateReaderFromFile {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+
+		return false;
 	}
-	
-	
-	
+
+
+
 	//Old Functions
 	private void testMethod1() {
-		
+
 		String path;
-		
+
 		//Charset test for docx file
 		//path = "H:\\Skrivbord\\ArkivItMap\\msOfficeFiles\\Opponerings Frågor.docx";
-		
+
 		//Charset test for pptx file
 		//path = "H:\\Skrivbord\\ArkivItMap\\msOfficeFiles\\Slutuppgift Java och databas.pptx";
-		
+
 		//Charset test for xlsx file
 		//path = "H:\\Skrivbord\\ArkivItMap\\msOfficeFiles\\E-halsomyndigheten_webb_metadata (2).xlsx";
-		
+
 		//Charset test for html file
 		//path =  "H:\\Skrivbord\\ArkivItMap\\msOfficeFiles\\Opponerings Frågor.docx";
 		path = "H:\\Skrivbord\\Kladdkaka.html";
-		
+
 		File file = new File(path);
-		
+
 		/*try {
 			/*CharsetToolkit toolKit = new CharsetToolkit(file);
-			
+
 			Charset charset = toolKit.getCharset();
-			
+
 			System.out.println(charset);*/
-			
+
 		/*} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}*/
-		
+
 	}
 
-	private void testMethod() {
-		
+	/*private void testMethod() {
+
 		java.io.Reader reader = null;
 		/*try {
 			java.io.File file = new java.io.File("H:\\Skrivbord\\TestFolder\\bugFixFiles\\TestFilesWithHTML1\\TestFiles\\subfolder\\m.xls");
 			reader = ReaderFactory.createBufferedReader(file);
-			
+
 			// Do whatever you want with the reader
-			
+
 		}
 		finally {
 			if (reader != null) {
 				reader.close();
 			}
 		}*/
-		File file = new File("H:\\Skrivbord\\Kladdkaka.html");
+	/*	File file = new File("H:\\Skrivbord\\Kladdkaka.html");
 		File file1 = new File("H:\\Skrivbord\\ArkivItMap\\msOfficeFiles\\Opponerings Frågor.docx");
 		//String encoding = UniversalDetector.detectCharset(file1);
 		String[] charsetsToBeTested = {"UTF-8", "windows-1253", "ISO-8859-7"};
 		Charset charsetForfile = checkDecoder.detectCharset(file, charsetsToBeTested);
-		
+
 		if (charsetForfile != null) {
 			System.out.println("Detected encoding = " + charsetForfile);
 		} else {
 			System.out.println("No encoding detected.");
 		}
-	}
-	
-/*	private void validatePdf1abFile()
+	}*/
+
+	/*	private void validatePdf1abFile()
 	{
 		String path;
 		path = "H:\\Skrivbord\\ArkivItMap\\TestFolder\\bugFixTestFiles\\msOfficeFiles\\Opponerings_Fraagor.pdf";
 		File file = new File(path);
-		
+
 		ValidationResult result = null;
 
 		try {
 			PreflightParser parser = new PreflightParser(file);
 			parser.parse();
-			
+
 			PreflightDocument doc = parser.getPreflightDocument();
 			doc.validate();
-			
+
 			result = (ValidationResult) doc.getResult();
 			doc.close();
-			
-			
+
+
 		} catch (IOException  e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		if(((org.apache.pdfbox.preflight.ValidationResult) result).isValid())
 		{
 			System.out.println("The file " + file.getName() + " is a valid PDF/A-1b file");
@@ -290,6 +431,6 @@ public class TestCreateReaderFromFile {
 		    }
 		}
 	}
-	*/
+	 */
 
 }

@@ -1,12 +1,21 @@
 package Test.code.Main;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadInfo;
+import java.lang.management.ThreadMXBean;
 import java.util.ArrayList;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.tika.metadata.PDF;
 
 import com.sun.star.beans.PropertyValue;
+import com.sun.star.comp.helper.Bootstrap;
 import com.sun.star.frame.XComponentLoader;
 import com.sun.star.frame.XDesktop;
 import com.sun.star.frame.XStorable;
@@ -16,6 +25,7 @@ import com.sun.star.uno.UnoRuntime;
 import com.sun.star.uno.XComponentContext;
 import com.sun.star.util.XCloseable;
 
+import ooo.connector.BootstrapConnector;
 import ooo.connector.BootstrapSocketConnector;
 
 public class DocumentConverter {
@@ -43,6 +53,9 @@ public class DocumentConverter {
 	private File outdir;
 	private File testFile;
 	private String libOfficePath;
+	private String removeBeginningOfPath, pathWithout_PDFA, TASKLIST = "tasklist";
+	private static String libreOfficePathWin = "C:/Program Files/LibreOffice/program/";
+	private BootstrapSocketConnector bsc;
 
 
 	File fileDirectory;
@@ -50,15 +63,53 @@ public class DocumentConverter {
 	ArrayList<File> convertedFiles;
 	ArrayList<File> fileList = new ArrayList<>(); 
 
-	
+
 	public DocumentConverter(String libOfficePath)
 	{	
-		this.libOfficePath = libOfficePath;
+		//this.libOfficePath = libOfficePath;
+		bsc = new BootstrapSocketConnector(libOfficePath);
 		libreOfficeConnectionMethod();
 	}
 
 
+	public static void main(String[] args)
+	{
+		DocumentConverter docCon = new DocumentConverter(libreOfficePathWin);
+		String path = "H:\\Skrivbord\\msOfficeFiles";
+		File file = new File(path);
+		int count = 0;
+		String libreOfficeAppMac = "LibreOffice.app", libreOfficeAppWin = "soffice.bin";
 
+		/*if(docCon.isProcessRunning(libreOfficeAppMac,libreOfficeAppWin))
+		{
+			docCon.closeLibreOffice();
+		}*/
+		
+		for(File currentFileOrDir : file.listFiles())
+		{
+			if(currentFileOrDir.getName().endsWith(".doc") || currentFileOrDir.getName().endsWith(".docx") || 
+					currentFileOrDir.getName().endsWith(".xls") || currentFileOrDir.getName().endsWith(".xlsx") ||
+					currentFileOrDir.getName().endsWith(".ppt") || currentFileOrDir.getName().endsWith(".pptx")) 
+			{
+				docCon.traverseAndConvert1(currentFileOrDir);
+				System.out.println("Hellö");
+			}
+		}
+		docCon.dumpThreadDump();
+		System.out.println("??");
+		docCon.closeLibreOffice();
+		//docCon.bsc.disconnect();
+
+
+	}
+
+	public void  dumpThreadDump() {
+		ThreadMXBean threadMxBean = ManagementFactory.getThreadMXBean();
+		for (ThreadInfo ti : threadMxBean.dumpAllThreads(true, true)) 
+		{
+			System.out.print(ti.toString());
+		}
+	}
 
 	public void libreOfficeConnectionMethod() {
 
@@ -74,9 +125,10 @@ public class DocumentConverter {
 
 
 			// get the remote office component context
-			
-			xContext = BootstrapSocketConnector.bootstrap(libOfficePath);
-			
+			//xContext = Bootstrap.bootstrap(); 
+			xContext = bsc.connect();
+			//xContext = BootstrapSocketConnector.bootstrap(libreOfficePathWin);
+
 			/*String osName = System.getProperty("os.name");
 			if(osName.contains("Windows"))
 			{
@@ -105,6 +157,8 @@ public class DocumentConverter {
 					xDesktop);
 
 
+
+
 			// Getting the given type to convert to
 			sConvertType = "writer_pdf_Export";
 
@@ -119,22 +173,29 @@ public class DocumentConverter {
 		catch( Exception e ) 
 		{
 			e.printStackTrace(System.err);
-			System.exit(1);
+			//System.exit(1);
 		}
 
 	}
 
 	public File traverseAndConvert1(File f)
 	{
-
+		
+		
+		
 		// Converting the document to the favored type
 		try 
 		{
+			FileInputStream input = new FileInputStream(f);
+			
 			// Composing the URL by replacing all backslashes
 			//String testUrl = "file:///" + f.getParentFile().getAbsolutePath().replace("\\", "/");
 			String testUrl = f.toPath().getParent().toUri().toString();
+			System.out.println(testUrl);
 			//String sUrl = "file:///" + f.getAbsolutePath().replace( '\\', '/' );
 			String sUrl = f.toPath().toUri().toString();
+			System.out.println(sUrl);
+
 
 
 			/*if(f.getName().endsWith(".doc") || f.getName().endsWith(".docx") || 
@@ -161,7 +222,7 @@ public class DocumentConverter {
 
 			// Preparing properties for converting the document
 			propertyValues = new PropertyValue[3];
-			
+
 			// Setting the flag for overwriting
 			propertyValues[0] = new PropertyValue();
 			propertyValues[0].Name = "Overwrite";
@@ -176,16 +237,37 @@ public class DocumentConverter {
 			propertyValues[2].Value = 2;
 
 			//Appending the favored extension to the origin document name
+
+
+
 			String tmp = FilenameUtils.removeExtension(f.getName());
 
-			String sStoreUrl = testUrl+ "/" + tmp + "." + sExtension;  
+			String sStoreUrl = "";
+
+			if(f.getName().endsWith(".pdf"))
+			{
+				sStoreUrl = testUrl + tmp + "_pdfA"+ "." + sExtension;  
+			}
+			else
+			{
+				sStoreUrl = testUrl + tmp + "." + sExtension;
+			}
+			
+
+			//String sStoreUrl = testUrl+ "/" + tmp +"_pdfA"+ "." + sExtension; 
+
+			System.out.println(sStoreUrl);
+
 			xStorable.storeToURL(sStoreUrl, propertyValues);
 
-			String removeBeginningOfPath = sStoreUrl.replace("file:///", "");
-			testFile = new File(removeBeginningOfPath);
+			System.out.println("Working?");
 
-			fileList.add(testFile);
-			System.out.println("Converted Files " + testFile.getName());
+
+			removeBeginningOfPath = sStoreUrl.replace("file:///", "");
+
+			System.out.println(removeBeginningOfPath);
+
+			//pathWithout_PDFA = removeBeginningOfPath.replaceAll("_pdfA", "");
 
 			//removeFile(fileDirectory);
 			// Closing the converted document. Use XCloseable.close if the
@@ -193,10 +275,13 @@ public class DocumentConverter {
 			XCloseable xCloseable =
 					UnoRuntime.queryInterface(XCloseable.class, xStorable);
 
+			/*XComponent xComponent = UnoRuntime.queryInterface(XComponent.class, xStorable);*/
 
 			if ( xCloseable != null ) 
 			{
 				xCloseable.close(false);
+
+				System.out.println("Closed?");
 			} 
 
 			else 
@@ -205,36 +290,58 @@ public class DocumentConverter {
 						UnoRuntime.queryInterface(XComponent.class, xStorable);
 
 				xComp.dispose();
+
 			}
+			
+			input.close();
 
-
-			//}
-
-			/*else 
-			{
-				System.out.println("NOT CONVERTED : " + f.getName());
-
-			} */
 		}
 
 		catch( Exception e ) 
 		{
 			e.printStackTrace(System.err);
 		}
-		
-		originalListFile.add(f);
-		
-		//closeLibreOffice();
-		//removeOldImgFormatFile(f);
 
-		return testFile;
+		originalListFile.add(f);
+
+		return new File(removeBeginningOfPath);
 	}
-	
+
+	public boolean isProcessRunning(String libreOfficeAppMac, String libreOfficeAppWin) {
+
+		Process p;
+		try {
+			p = Runtime.getRuntime().exec(TASKLIST);
+
+			BufferedReader reader = new BufferedReader(new InputStreamReader(
+					p.getInputStream()));
+			String line;
+			while ((line = reader.readLine()) != null) 
+			{
+
+				// System.out.println(line);
+				if (line.contains(libreOfficeAppMac) || line.contains(libreOfficeAppWin)) 
+				{
+					return true;
+				}
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return false;
+
+	}
+
 	public void closeLibreOffice() {
+
 		Runtime rt = Runtime.getRuntime();
-		String libreOfficeApp = "LibreOffice.app";
+
+		String libreOfficeAppMac = "LibreOffice.app", libreOfficeAppWin = "soffice.bin";
+
 		String  osName;
-		
+
 		try 
 
 		{
@@ -242,11 +349,13 @@ public class DocumentConverter {
 			//test(p.getInputStream());
 			if(osName.contains("Windows"))
 			{
-				rt.exec("taskkill /IM soffice.bin");
+				bsc.disconnect();
+				rt.exec("taskkill /F /IM " + libreOfficeAppWin);
 			}
 			else if(osName.contains("Mac") || osName.contains("Ubuntu") || osName.contains("Debian"))
 			{
-				rt.exec("pkill -f " + libreOfficeApp);
+				bsc.disconnect();
+				rt.exec("pkill -f " + libreOfficeAppMac);
 			}
 
 
@@ -258,13 +367,24 @@ public class DocumentConverter {
 			e.printStackTrace();
 
 		} 
-		
-		
+
+
 	}
 
 	public void removeMsOfficeFormatFile(File tempFile) 
 	{
-		tempFile.delete();
+		System.out.println("File that is being deleted : "  + tempFile.getAbsolutePath());
+		
+		boolean isFileDeleted = tempFile.delete();
+		
+		if(isFileDeleted)
+		{
+			System.out.println("File is deleted.");
+		}
+		else
+		{
+			System.out.println("File is not deleted.");
+		}
 	}
 
 	public void traverseAndConvert(String targetPath) {
@@ -380,24 +500,6 @@ public class DocumentConverter {
 
 	}
 
-	public void removeFile3(File file) 
-	{
-
-		for(int i = 0; i<fileList.size(); i++) 
-		{
-
-			if(fileList.get(i).getName().endsWith(".doc") || fileList.get(i).getName().endsWith(".docx") || 
-					fileList.get(i).getName().endsWith(".xls") ||fileList.get(i).getName().endsWith(".xlsx") ||
-					fileList.get(i).getName().endsWith(".ppt") || fileList.get(i).getName().endsWith(".pptx")) 
-			{
-				File tempFile = fileList.get(i);
-				fileList.remove(tempFile);
-				tempFile.delete();
-			}
-
-		} 
-	}
-
 	public  File getOutdir() {
 		return outdir;
 	}
@@ -425,4 +527,25 @@ public class DocumentConverter {
 	public void setLibOfficePath(String libOfficePath) {
 		this.libOfficePath = libOfficePath;
 	}
+
+	public String getRemoveBeginningOfPath() {
+		return removeBeginningOfPath;
+	}
+
+	public String getPathWithout_PDFA() {
+		return pathWithout_PDFA;
+	}
+
+
+	public BootstrapSocketConnector getBsc() {
+		return bsc;
+	}
+
+	public void setBsc(BootstrapSocketConnector bsc) {
+		this.bsc = bsc;
+	}
+	
+	
+
+
 }

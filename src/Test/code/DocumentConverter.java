@@ -1,12 +1,10 @@
-package com.arkivit.model.converters;
+package Test.code;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.tika.metadata.PDF;
 
 import com.sun.star.beans.PropertyValue;
 import com.sun.star.frame.XComponentLoader;
@@ -19,6 +17,15 @@ import com.sun.star.uno.XComponentContext;
 import com.sun.star.util.XCloseable;
 
 import ooo.connector.BootstrapSocketConnector;
+
+/**
+ * 
+ * This class converts all office document files to PDF/A with the help of LibreOffice program. This class source code is taken from <br>
+ * LibreOffice website.
+ * 
+ * @author Saikat Talukder
+ * @since 2018-08-07
+ */
 
 public class DocumentConverter {
 
@@ -45,9 +52,6 @@ public class DocumentConverter {
 	private File outdir;
 	private File testFile;
 	private String libOfficePath;
-	private String removeBeginningOfPath, pathWithout_PDFA;
-	public BootstrapSocketConnector bsc;
-	private static String libreOfficePathWin = "C:/Program Files/LibreOffice/program/";
 
 
 	File fileDirectory;
@@ -58,8 +62,7 @@ public class DocumentConverter {
 
 	public DocumentConverter(String libOfficePath)
 	{	
-		//this.libOfficePath = libOfficePath;
-		bsc = new BootstrapSocketConnector(libreOfficePathWin);
+		this.libOfficePath = libOfficePath;
 		libreOfficeConnectionMethod();
 	}
 
@@ -70,8 +73,8 @@ public class DocumentConverter {
 
 
 		//String libreOfficePath = "/C:/Program Files (x86)/LibreOffice/program/soffice.exe/";
-		String libreOfficePathMac = "/Applications/LibreOffice.app/Contents/MacOS/";
-		String libreOfficePathWin = "C:/Program Files/LibreOffice/program/soffice.exe";
+		//String libreOfficePathMac = "/Applications/LibreOffice.app/Contents/MacOS/";
+		//String libreOfficePathWin = "C:/Program Files/LibreOffice/program/soffice.exe";
 
 
 		XComponentContext xContext = null;
@@ -81,10 +84,8 @@ public class DocumentConverter {
 
 			// get the remote office component context
 
-			//xContext = BootstrapSocketConnector.bootstrap(libOfficePath);
-			
-			xContext = bsc.connect();
-			
+			xContext = BootstrapSocketConnector.bootstrap(libOfficePath);
+
 			/*String osName = System.getProperty("os.name");
 			if(osName.contains("Windows"))
 			{
@@ -99,7 +100,7 @@ public class DocumentConverter {
 			}*/
 
 
-			// get the remote office service manager
+			//Get the remote office service manager
 			XMultiComponentFactory xMCF =
 					xContext.getServiceManager();
 
@@ -127,25 +128,22 @@ public class DocumentConverter {
 		catch( Exception e ) 
 		{
 			e.printStackTrace(System.err);
-			//System.exit(1);
+			System.exit(1);
 		}
 
 	}
 
 	public File traverseAndConvert1(File f)
 	{
-		
+
 		// Converting the document to the favored type
 		try 
 		{
 			// Composing the URL by replacing all backslashes
 			//String testUrl = "file:///" + f.getParentFile().getAbsolutePath().replace("\\", "/");
 			String testUrl = f.toPath().getParent().toUri().toString();
-			System.out.println(testUrl);
 			//String sUrl = "file:///" + f.getAbsolutePath().replace( '\\', '/' );
 			String sUrl = f.toPath().toUri().toString();
-			System.out.println(sUrl);
-		
 
 
 			/*if(f.getName().endsWith(".doc") || f.getName().endsWith(".docx") || 
@@ -177,6 +175,7 @@ public class DocumentConverter {
 			propertyValues[0] = new PropertyValue();
 			propertyValues[0].Name = "Overwrite";
 			propertyValues[0].Value = Boolean.TRUE;
+
 			// Setting the filter name
 			propertyValues[1] = new PropertyValue();
 			propertyValues[1].Name = "FilterName";
@@ -187,38 +186,26 @@ public class DocumentConverter {
 			propertyValues[2].Value = 2;
 
 			//Appending the favored extension to the origin document name
-
-
-
 			String tmp = FilenameUtils.removeExtension(f.getName());
-			
 			String sStoreUrl = "";
 
 			if(f.getName().endsWith(".pdf"))
 			{
-				sStoreUrl = testUrl+ tmp + "_pdfA"+ "." + sExtension;  
+				sStoreUrl = testUrl+ "/" + tmp + "_pdfA"+ "." + sExtension;  
 			}
 			else
 			{
-				sStoreUrl = testUrl + tmp + "." + sExtension;
+				sStoreUrl = testUrl+ "/" + tmp + "." + sExtension;
 			}
 			
-			
-			//String sStoreUrl = testUrl+ "/" + tmp +"_pdfA"+ "." + sExtension; 
-			
-			System.out.println(sStoreUrl);
-			
 			xStorable.storeToURL(sStoreUrl, propertyValues);
-			
-			System.out.println("Working?");
-			
 
-			removeBeginningOfPath = sStoreUrl.replace("file:///", "");
-			
-			System.out.println(removeBeginningOfPath);
-			
-			//pathWithout_PDFA = removeBeginningOfPath.replaceAll("_pdfA", "");
-			
+			String removeBeginningOfPath = sStoreUrl.replace("file:///", "");
+			testFile = new File(removeBeginningOfPath);
+
+			//fileList.add(testFile);
+			System.out.println("Converted Files " + testFile.getName());
+
 			//removeFile(fileDirectory);
 			// Closing the converted document. Use XCloseable.close if the
 			// interface is supported, otherwise use XComponent.dispose
@@ -238,7 +225,7 @@ public class DocumentConverter {
 
 				xComp.dispose();
 			}
-			
+
 		}
 
 		catch( Exception e ) 
@@ -248,29 +235,28 @@ public class DocumentConverter {
 
 		originalListFile.add(f);
 
-		return new File(removeBeginningOfPath);
+		//closeLibreOffice();
+		//removeOldImgFormatFile(f);
+
+		return testFile;
 	}
 
 	public void closeLibreOffice() {
-
 		Runtime rt = Runtime.getRuntime();
-
-		String libreOfficeAppMac = "LibreOffice.app", libreOfficeAppWin = "soffice.bin";
-
+		String libreOfficeApp = "LibreOffice.app";
 		String  osName;
 
-		try 
-
+		try
 		{
 			osName = System.getProperty("os.name");
 			//test(p.getInputStream());
 			if(osName.contains("Windows"))
 			{
-				rt.exec("taskkill /F /IM " + libreOfficeAppWin);
+				rt.exec("taskkill /IM soffice.bin");
 			}
 			else if(osName.contains("Mac") || osName.contains("Ubuntu") || osName.contains("Debian"))
 			{
-				rt.exec("pkill -f " + libreOfficeAppMac);
+				rt.exec("pkill -f " + libreOfficeApp);
 			}
 
 
@@ -449,14 +435,4 @@ public class DocumentConverter {
 	public void setLibOfficePath(String libOfficePath) {
 		this.libOfficePath = libOfficePath;
 	}
-
-	public String getRemoveBeginningOfPath() {
-		return removeBeginningOfPath;
-	}
-
-	public String getPathWithout_PDFA() {
-		return pathWithout_PDFA;
-	}
-	
-	
 }

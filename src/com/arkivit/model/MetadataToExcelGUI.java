@@ -30,6 +30,8 @@ import com.arkivit.model.file.GeneralBean;
 import com.arkivit.model.parser.ReadAndUpdateLinks;
 import com.arkivit.view.FirstScene;
 
+import Test.code.Main.CloseLibreOffice;
+
 
 /**
  * This class is handling the process of sending data and importing metadata from files
@@ -54,9 +56,9 @@ public class MetadataToExcelGUI{
 	private ArrayList<File> fileList = new ArrayList<File>();
 	private ArrayList<File> mappedFiles = new ArrayList<File>(), mappedFolder = new ArrayList<File>();
 	private ArrayList<String> illegalCharFiles = new ArrayList<String>(), illegarCharFolders = new ArrayList<String>();
-	private ArrayList<File> convertedFiles = new ArrayList<File>();
+	private ArrayList<File> convertedFiles = new ArrayList<File>(), unValidPdfAFiles = new ArrayList<File>();
 	private int fileCount = 0;
-	private int count;
+	private int count = 0;
 	private FileDuration  fileDuration = new FileDuration(); 
 	private Tika fileType = new Tika();
 	private String duration, fPath, currentFileName, tempString, tempPath, newFileString;
@@ -68,6 +70,9 @@ public class MetadataToExcelGUI{
 	private boolean mapping = false;
 	private boolean overwrite = false;
 	private boolean isLibreOfficeOpen = false;
+	private boolean isValid = false;
+	private ArrayList<File> renamedPdfAFileList = new ArrayList<File>();
+	private ArrayList<File> originalPdfAFileList = new ArrayList<File>();
 
 	/**
 	 * No args constructor
@@ -100,14 +105,18 @@ public class MetadataToExcelGUI{
 	 * @param mapping A boolean, false by default
 	 * @throws IOException 
 	 * @throws TranscoderException 
+	 * 
 	 */
 	public void init(boolean mapp, boolean overW) throws IOException{
 
 		this.mapping = mapp;
 		this.overwrite = overW;
-
+		
+		
 		docCon = new DocumentConverter(libOfficePath);
 		
+		//CloseLibreOffice cLO = new CloseLibreOffice(docCon);
+		//cLO.init();
 		folderName = new File(sourceFolderPath).getName();
 
 		if(mapping && !overwrite) 
@@ -115,29 +124,113 @@ public class MetadataToExcelGUI{
 			copyFolder();
 		}
 
-		//docCon.libreOfficeConnectionMethod();
-		//deleteOfficeFiles(sourceFolderPath);
-		//img.convertImage(sourceFolderPath);
-		//deleteIllegalImageFiles(sourceFolderPath);
-
 		listOfFilesAndDirectory(sourceFolderPath);
-
-		closeLibreOffice();
-		deleteOfficeFiles();
+		
+		closeAndDeleteFilesFromLibreOfficeClass();
+		File pdfAFile;
 		
 		for(File f : fileList)
 		{
 			if(f.getName().endsWith(".pdf"))
 			{
-				validatePdf1abFile(f);
+				if(!validatePdf1abFile(f))
+				{
+					originalPdfAFileList.add((f = docCon.traverseAndConvert1(f)));
+					renamedPdfAFileList.add(pdfAFile = new File(f.getAbsolutePath().replace("_pdfA", "")));
+					
+					f = pdfAFile;
+					
+					System.out.println("File renamed? " + f.getAbsolutePath());
+				}
 			}
+		}	
+		
+		
+		docCon.bsc.disconnect();
+		
+		//closeAndDeleteFilesFromLibreOfficeClass();
+		
+		//CloseLibreOffice cLO = new CloseLibreOffice();
+		//cLO.init();
+		System.out.println("I'm here??!");
+		int counter = 0;
+		for(File f : originalPdfAFileList)
+		{
+			System.out.println(f.getName());
+			System.out.println(renamedPdfAFileList.get(counter).getName());
+			
+			File file = new File(renamedPdfAFileList.get(counter).getAbsolutePath());
+			
+			
+			//cLO.init();
+			//docCon.bsc.disconnect();
+			if(file.delete())
+			{
+				System.out.println("Delete Success!");
+			}
+			else
+			{
+				System.out.println("Delete Failed");
+			}
+			
+			if(f.renameTo(renamedPdfAFileList.get(counter)))
+			{
+				System.out.println("Success!");
+			}
+			else
+			{
+				System.out.println("Failed");
+			}
+			counter++;
 		}
+		
+		/*for(int i = 0; i < originalPdfAFileList.size(); i++)
+		{
+			
+		}*/
 		
 		getAndAddFileDataToList();
 		//getAndAddFileDataToList();
 
 	}
 
+
+	private void renamePdfAFileToOriginalName() {
+		
+		for(File f : fileList)
+		{
+			if(f.getName().endsWith(".pdf"))
+			{
+				if(!validatePdf1abFile(f))
+				{
+					f = docCon.traverseAndConvert1(f);
+					
+					closeAndDeleteFilesFromLibreOfficeClass();
+			
+					File pdfAFile = new File(f.getAbsolutePath().replaceAll("_pdfA", ""));
+					
+					if(f.renameTo(pdfAFile))
+					{
+						System.out.println("Success!");
+					}
+					else
+					{
+						System.out.println("Failed!");
+					}
+					
+					f = pdfAFile;
+					
+					System.out.println("File renamed? " + f.getName());
+				}
+			}
+		}	
+		
+	}
+
+	private void closeAndDeleteFilesFromLibreOfficeClass() {
+		closeLibreOffice();
+		deleteOfficeFiles();	
+	}
 
 	/**
 	 * 
@@ -212,40 +305,45 @@ public class MetadataToExcelGUI{
 	 * 
 	 * @param file
 	 */
-	private void validatePdf1abFile(File file)
+	private boolean validatePdf1abFile(File file)
 	{
+		isValid = false;
 		VeraGreenfieldFoundryProvider.initialise();
 		
 		try (PDFAParser parser = Foundries.defaultInstance().createParser(file)) {
 		    PDFAValidator validator = Foundries.defaultInstance().createValidator(parser.getFlavour(), false);
 		    ValidationResult result = validator.validate(parser);
-		    if (result.isCompliant()) {
-		      // File is a valid PDF/A 1b
-		    	String validPdfAFile = "This PDF file, "+ file.getName() +" is a valid PDF/A 1b";	    	
+		    if (result.isCompliant()) 
+		    {
+		    	// File is a valid PDF/A
+		    	String validPdfAFile = "This PDF file, "+ file.getName() +" is a valid PDF/A.";	    	
 		    	validPdfAList.add(file.getName());
-		    	
 		    	System.out.println(validPdfAFile);
 		    	
-		    } else {
-		    	String unvalidPdfAFile = "This PDF file, "+ file.getName() +" is not a valid PDF/A 1b";	    	
-		    	unvalidPdfAList.add(file.getName());
+		    	isValid = true;
 		    	
+		    } 
+		    else 
+		    {
+		    	//File is a unvalid PDF/A
+		    	String unvalidPdfAFile = "This PDF file, "+ file.getName() +" is not a valid PDF/A.";	    	
+		    	unvalidPdfAList.add(file.getName());
 		    	System.out.println(unvalidPdfAFile);
+		    	isValid = false;
 		    	
 		    }
 		} catch (ModelParsingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (EncryptedPdfException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ValidationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		return isValid;
+		
 	}
 
 	/**
@@ -253,11 +351,12 @@ public class MetadataToExcelGUI{
 	 * @param inputFolder
 	 * @throws IOException
 	 */
-	/* Goes through folder and subfolders and adding files to an ArrayList.
+	/* Goes through folder and sub-folders and adding files to an ArrayList.
 	 * If mapping = true All files with illegal characters are renamed.
 	 * If file is a directory the path will be retrieved.a
 	 */
-	private void listOfFilesAndDirectory(String inputFolder) throws IOException {
+	private void listOfFilesAndDirectory(String inputFolder) throws IOException 
+	{
 		File folder = new File(inputFolder);
 
 		for(File currentFileOrDir : folder.listFiles())
@@ -268,7 +367,6 @@ public class MetadataToExcelGUI{
 				//tempFile = new File(currentFileOrDir.getAbsolutePath());
 
 				currentFileOrDir = fileStatmentChecker(currentFileOrDir);
-
 
 				fileList.add(currentFileOrDir);
 				System.out.println("Current File : "  + currentFileOrDir.getName());
@@ -309,10 +407,9 @@ public class MetadataToExcelGUI{
 		{
 			currentFile = doMapping(currentFile,false);
 		}
-		else
-		{
-			currentFile = imgAndMsOfficeFileChecker(currentFile);
-		}
+	
+		currentFile = imgAndMsOfficeFileChecker(currentFile);
+		
 
 		return currentFile;
 	}
@@ -327,6 +424,17 @@ public class MetadataToExcelGUI{
 		{
 			currentFile = new File(docCon.traverseAndConvert1(currentFile).getAbsolutePath());
 		}
+		
+		/*else if(currentFile.getName().endsWith(".pdf"))
+		{
+			validatePdf1abFile(currentFile);
+			if(!isValid)
+			{
+				File _currentFile = new File(docCon.traverseAndConvert1(currentFile).getAbsolutePath());
+				currentFile = new File(_currentFile.getAbsolutePath().replace("_pdfA", ""));
+				_currentFile.renameTo(currentFile);
+			}
+		}*/
 		
 		return currentFile;
 	}
@@ -772,7 +880,6 @@ public class MetadataToExcelGUI{
 
 	}
 
-
 	public ArrayList<String> getValidPdfAList() {
 		return validPdfAList;
 	}
@@ -816,7 +923,6 @@ public class MetadataToExcelGUI{
 	public void setSourceFolderPath(String sourceFolderPath) {
 		this.sourceFolderPath = sourceFolderPath;
 	}
-
 
 	public int getFileCount() {
 		return fileCount;
@@ -891,7 +997,6 @@ public class MetadataToExcelGUI{
 		return fileList;
 	}
 	
-
 	public String getLibOfficePath() {
 		return libOfficePath;
 	}
