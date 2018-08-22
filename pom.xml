@@ -16,12 +16,15 @@
 			<version>1.4.5</version>
 		</dependency>
 		
-		<!-- https://mvnrepository.com/artifact/org.apache.xmlgraphics/fop -->
+		<!-- https://mvnrepository.com/artifact/org.verapdf/pdf-model -->
+		<!-- https://mvnrepository.com/artifact/org.verapdf/core -->
 		<dependency>
-    		<groupId>org.apache.xmlgraphics</groupId>
-    		<artifactId>fop</artifactId>
-   			 <version>2.3</version>
+  			<groupId>org.verapdf</groupId>
+ 			<artifactId>pdfbox-validation-model</artifactId>
+  			<version>1.4.5</version>
 		</dependency>
+
+		
 		
 		<!-- 
 		################1###############

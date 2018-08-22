@@ -1,17 +1,19 @@
-package Test.code.Main;
+package com.arkivit.model;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+
+import com.arkivit.model.converters.DocumentConverter;
 
 public class CloseLibreOffice {
 	
 	private String TASKLIST = "tasklist";
 	private DocumentConverter docCon;
 	
-	public CloseLibreOffice(DocumentConverter docCon2) {
+	public CloseLibreOffice(DocumentConverter docCon) {
 		
-		this.docCon = docCon2;
+		this.docCon = docCon;
 		
 	}
 	
@@ -31,20 +33,7 @@ public class CloseLibreOffice {
 			closeLB(libreOfficeAppMac,libreOfficeAppWin);
 			docCon.getBsc().disconnect();
 			init();
-			/*if(isProcessRunning(libreOfficeAppMac,libreOfficeAppWin))
-			{
-				System.out.println("LibreOffice is still opened.");
-				docCon.getBsc().disconnect();
-				closeLB(libreOfficeAppMac,libreOfficeAppWin);
-				if(isProcessRunning(libreOfficeAppMac,libreOfficeAppWin))
-				{
-					System.out.println("LibreOffice could not be closed.");
-				}
-				else {
-					System.out.println("LibreOffice is closed.");
-				}
-			}*/
-			
+		
 		}
 		else {
 			System.out.println("LibreOffice is closed.");
@@ -102,7 +91,6 @@ public class CloseLibreOffice {
 			if(osName.contains("Windows"))
 			{
 				rt.exec("taskkill /F /IM " + libreOfficeAppWin);
-				//rt.exec("taskkill /F /IM soffice.exe");
 			}
 			else if(osName.contains("Mac") || osName.contains("Ubuntu") || osName.contains("Debian"))
 			{

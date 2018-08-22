@@ -125,23 +125,8 @@ public class DocumentConverter {
 
 
 			// get the remote office component context
-			//xContext = Bootstrap.bootstrap(); 
 			xContext = bsc.connect();
 			//xContext = BootstrapSocketConnector.bootstrap(libreOfficePathWin);
-
-			/*String osName = System.getProperty("os.name");
-			if(osName.contains("Windows"))
-			{
-
-				xContext = BootstrapSocketConnector.bootstrap(libreOfficePathWin);
-				System.out.println("Connected to a running office ...");
-			}
-			else if(osName.contains("Mac") || osName.contains("Ubuntu") || osName.contains("Debian"))
-			{
-				xContext = BootstrapSocketConnector.bootstrap(libreOfficePathMac);
-				//System.out.println("Connected to a running office ...");
-			}*/
-
 
 			// get the remote office service manager
 			XMultiComponentFactory xMCF =
@@ -181,12 +166,9 @@ public class DocumentConverter {
 	public File traverseAndConvert1(File f)
 	{
 		
-		
-		
 		// Converting the document to the favored type
 		try 
 		{
-			FileInputStream input = new FileInputStream(f);
 			
 			// Composing the URL by replacing all backslashes
 			//String testUrl = "file:///" + f.getParentFile().getAbsolutePath().replace("\\", "/");
@@ -246,36 +228,25 @@ public class DocumentConverter {
 
 			if(f.getName().endsWith(".pdf"))
 			{
-				sStoreUrl = testUrl + tmp + "_pdfA"+ "." + sExtension;  
+				sStoreUrl = testUrl + "/" + tmp + "_pdfA"+ "." + sExtension;  
 			}
 			else
 			{
-				sStoreUrl = testUrl + tmp + "." + sExtension;
+				sStoreUrl = testUrl +  "/" + tmp + "." + sExtension;
 			}
 			
-
-			//String sStoreUrl = testUrl+ "/" + tmp +"_pdfA"+ "." + sExtension; 
 
 			System.out.println(sStoreUrl);
 
 			xStorable.storeToURL(sStoreUrl, propertyValues);
 
-			System.out.println("Working?");
-
-
 			removeBeginningOfPath = sStoreUrl.replace("file:///", "");
 
 			System.out.println(removeBeginningOfPath);
 
-			//pathWithout_PDFA = removeBeginningOfPath.replaceAll("_pdfA", "");
-
-			//removeFile(fileDirectory);
 			// Closing the converted document. Use XCloseable.close if the
 			// interface is supported, otherwise use XComponent.dispose
-			XCloseable xCloseable =
-					UnoRuntime.queryInterface(XCloseable.class, xStorable);
-
-			/*XComponent xComponent = UnoRuntime.queryInterface(XComponent.class, xStorable);*/
+			XCloseable xCloseable = UnoRuntime.queryInterface(XCloseable.class, xStorable);
 
 			if ( xCloseable != null ) 
 			{
@@ -286,15 +257,12 @@ public class DocumentConverter {
 
 			else 
 			{
-				XComponent xComp =
-						UnoRuntime.queryInterface(XComponent.class, xStorable);
+				XComponent xComp = UnoRuntime.queryInterface(XComponent.class, xStorable);
 
 				xComp.dispose();
 
 			}
 			
-			input.close();
-
 		}
 
 		catch( Exception e ) 

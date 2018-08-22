@@ -1,5 +1,7 @@
 package com.arkivit.model;
 
+
+//Java imports
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -7,6 +9,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+
+//VERAPDF IMPORTS
 import org.apache.batik.transcoder.TranscoderException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -18,9 +22,10 @@ import org.verapdf.core.ValidationException;
 import org.verapdf.pdfa.Foundries;
 import org.verapdf.pdfa.PDFAParser;
 import org.verapdf.pdfa.PDFAValidator;
-import org.verapdf.pdfa.VeraGreenfieldFoundryProvider;
+import org.verapdf.pdfa.PdfBoxFoundryProvider;
 import org.verapdf.pdfa.results.ValidationResult;
 
+//This programs class imports
 import com.arkivit.model.converters.DocumentConverter;
 import com.arkivit.model.converters.ImageFileConverter;
 import com.arkivit.model.excel.ExcelFileCreator;
@@ -28,9 +33,6 @@ import com.arkivit.model.file.FileDuration;
 import com.arkivit.model.file.FileExtension;
 import com.arkivit.model.file.GeneralBean;
 import com.arkivit.model.parser.ReadAndUpdateLinks;
-import com.arkivit.view.FirstScene;
-
-import Test.code.Main.CloseLibreOffice;
 
 
 /**
@@ -112,11 +114,9 @@ public class MetadataToExcelGUI{
 		this.mapping = mapp;
 		this.overwrite = overW;
 		
-		
 		docCon = new DocumentConverter(libOfficePath);
+		CloseLibreOffice closeLib = new CloseLibreOffice(docCon);
 		
-		//CloseLibreOffice cLO = new CloseLibreOffice(docCon);
-		//cLO.init();
 		folderName = new File(sourceFolderPath).getName();
 
 		if(mapping && !overwrite) 
@@ -126,8 +126,7 @@ public class MetadataToExcelGUI{
 
 		listOfFilesAndDirectory(sourceFolderPath);
 		
-		closeAndDeleteFilesFromLibreOfficeClass();
-		File pdfAFile;
+		deleteOfficeFiles();
 		
 		for(File f : fileList)
 		{
@@ -135,66 +134,55 @@ public class MetadataToExcelGUI{
 			{
 				if(!validatePdf1abFile(f))
 				{
-					originalPdfAFileList.add((f = docCon.traverseAndConvert1(f)));
-					renamedPdfAFileList.add(pdfAFile = new File(f.getAbsolutePath().replace("_pdfA", "")));
-					
-					f = pdfAFile;
-					
-					System.out.println("File renamed? " + f.getAbsolutePath());
+					f = convertPDFToPDFA(f, closeLib);
 				}
+				
+				
 			}
 		}	
 		
-		
-		docCon.bsc.disconnect();
-		
-		//closeAndDeleteFilesFromLibreOfficeClass();
-		
-		//CloseLibreOffice cLO = new CloseLibreOffice();
-		//cLO.init();
-		System.out.println("I'm here??!");
-		int counter = 0;
-		for(File f : originalPdfAFileList)
-		{
-			System.out.println(f.getName());
-			System.out.println(renamedPdfAFileList.get(counter).getName());
-			
-			File file = new File(renamedPdfAFileList.get(counter).getAbsolutePath());
-			
-			
-			//cLO.init();
-			//docCon.bsc.disconnect();
-			if(file.delete())
-			{
-				System.out.println("Delete Success!");
-			}
-			else
-			{
-				System.out.println("Delete Failed");
-			}
-			
-			if(f.renameTo(renamedPdfAFileList.get(counter)))
-			{
-				System.out.println("Success!");
-			}
-			else
-			{
-				System.out.println("Failed");
-			}
-			counter++;
-		}
-		
-		/*for(int i = 0; i < originalPdfAFileList.size(); i++)
-		{
-			
-		}*/
+		closeLib.init();
 		
 		getAndAddFileDataToList();
-		//getAndAddFileDataToList();
+		
 
 	}
 
+	public File convertPDFToPDFA(File pdfFile, CloseLibreOffice cLO)
+	{
 
+		File tmpFile = pdfFile;
+		System.out.println(tmpFile.getAbsolutePath());
+		
+		pdfFile = docCon.traverseAndConvert1(pdfFile);
+		
+		System.out.println(pdfFile.getAbsolutePath());
+
+		File pdfAFile = new File(tmpFile.getAbsolutePath());
+
+		docCon.removeMsOfficeFormatFile(tmpFile);
+		docCon.getOriginalListFile().clear();
+
+		System.out.println("Renamed file works? " + pdfAFile.getAbsolutePath());
+		System.out.println("Original file works? " + pdfFile.getAbsolutePath());
+
+		boolean isRenamed = pdfFile.renameTo(pdfAFile);
+
+		System.out.println("Temp file :" + tmpFile);
+
+		if(isRenamed)
+		{
+			System.out.println("Success!");
+			//docCon.removeMsOfficeFormatFile(pdfFile);
+		}else {
+			System.out.println("Fail!");
+		}
+		
+		return pdfAFile;
+
+	}
+	
+	
 	private void renamePdfAFileToOriginalName() {
 		
 		for(File f : fileList)
@@ -308,7 +296,8 @@ public class MetadataToExcelGUI{
 	private boolean validatePdf1abFile(File file)
 	{
 		isValid = false;
-		VeraGreenfieldFoundryProvider.initialise();
+		
+		PdfBoxFoundryProvider.initialise();
 		
 		try (PDFAParser parser = Foundries.defaultInstance().createParser(file)) {
 		    PDFAValidator validator = Foundries.defaultInstance().createValidator(parser.getFlavour(), false);

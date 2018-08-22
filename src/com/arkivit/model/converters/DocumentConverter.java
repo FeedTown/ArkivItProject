@@ -59,7 +59,7 @@ public class DocumentConverter {
 	public DocumentConverter(String libOfficePath)
 	{	
 		//this.libOfficePath = libOfficePath;
-		bsc = new BootstrapSocketConnector(libreOfficePathWin);
+		bsc = new BootstrapSocketConnector(libOfficePath);
 		libreOfficeConnectionMethod();
 	}
 
@@ -78,27 +78,10 @@ public class DocumentConverter {
 
 		try {
 
-
 			// get the remote office component context
-
-			//xContext = BootstrapSocketConnector.bootstrap(libOfficePath);
-			
+				//xContext = BootstrapSocketConnector.bootstrap(libOfficePath);
 			xContext = bsc.connect();
 			
-			/*String osName = System.getProperty("os.name");
-			if(osName.contains("Windows"))
-			{
-
-				xContext = BootstrapSocketConnector.bootstrap(libreOfficePathWin);
-				System.out.println("Connected to a running office ...");
-			}
-			else if(osName.contains("Mac") || osName.contains("Ubuntu") || osName.contains("Debian"))
-			{
-				xContext = BootstrapSocketConnector.bootstrap(libreOfficePathMac);
-				//System.out.println("Connected to a running office ...");
-			}*/
-
-
 			// get the remote office service manager
 			XMultiComponentFactory xMCF =
 					xContext.getServiceManager();
@@ -139,10 +122,8 @@ public class DocumentConverter {
 		try 
 		{
 			// Composing the URL by replacing all backslashes
-			//String testUrl = "file:///" + f.getParentFile().getAbsolutePath().replace("\\", "/");
 			String testUrl = f.toPath().getParent().toUri().toString();
 			System.out.println(testUrl);
-			//String sUrl = "file:///" + f.getAbsolutePath().replace( '\\', '/' );
 			String sUrl = f.toPath().toUri().toString();
 			System.out.println(sUrl);
 		
@@ -196,15 +177,13 @@ public class DocumentConverter {
 
 			if(f.getName().endsWith(".pdf"))
 			{
-				sStoreUrl = testUrl+ tmp + "_pdfA"+ "." + sExtension;  
+				sStoreUrl = testUrl + "/" + tmp + "_pdfA"+ "." + sExtension;  
 			}
 			else
 			{
-				sStoreUrl = testUrl + tmp + "." + sExtension;
+				sStoreUrl = testUrl +  "/" + tmp + "." + sExtension;
 			}
 			
-			
-			//String sStoreUrl = testUrl+ "/" + tmp +"_pdfA"+ "." + sExtension; 
 			
 			System.out.println(sStoreUrl);
 			
@@ -217,9 +196,6 @@ public class DocumentConverter {
 			
 			System.out.println(removeBeginningOfPath);
 			
-			//pathWithout_PDFA = removeBeginningOfPath.replaceAll("_pdfA", "");
-			
-			//removeFile(fileDirectory);
 			// Closing the converted document. Use XCloseable.close if the
 			// interface is supported, otherwise use XComponent.dispose
 			XCloseable xCloseable =
@@ -457,6 +433,12 @@ public class DocumentConverter {
 	public String getPathWithout_PDFA() {
 		return pathWithout_PDFA;
 	}
+
+
+	public BootstrapSocketConnector getBsc() {
+		return bsc;
+	}
+	
 	
 	
 }

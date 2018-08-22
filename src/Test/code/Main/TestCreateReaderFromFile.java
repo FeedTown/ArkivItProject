@@ -19,14 +19,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.stream.StreamSource;
 
-//Apache Fop
-import org.apache.fop.apps.FopFactory;
-import org.apache.fop.apps.FOUserAgent;
-import org.apache.fop.apps.Fop;
-import org.apache.fop.apps.MimeConstants;
 
 //VERAPDF GREENFIELD IMORTS
-import org.verapdf.pdfa.VeraGreenfieldFoundryProvider;
 import org.verapdf.core.EncryptedPdfException;
 import org.verapdf.core.ModelParsingException;
 import org.verapdf.core.ValidationException;
@@ -35,6 +29,9 @@ import org.verapdf.pdfa.PDFAParser;
 import org.verapdf.pdfa.results.ValidationResult;
 import org.xml.sax.SAXException;
 import org.verapdf.pdfa.PDFAValidator;
+import org.verapdf.pdfa.PdfBoxFoundryProvider;
+import org.verapdf.pdfa.VeraFoundryProvider;
+import org.verapdf.pdfa.VeraGreenfieldFoundryProvider;
 import org.verapdf.pdfa.flavours.PDFAFlavour;
 
 import com.arkivit.model.CharsetDetector;
@@ -46,6 +43,7 @@ public class TestCreateReaderFromFile {
 	private String libreOfficePathWin = "C:/Program Files/LibreOffice/program/", path = "H:\\Skrivbord\\msOfficeFiles";
 	private String pdfFilePath = "H:\\Skrivbord\\Min_Aktivitetsrapport_201710-47051.pdf", path2 = "H:\\Skrivbord\\New_folder\\";
 	private String libreOfficeAppMac = "LibreOffice.app", libreOfficeAppWin = "soffice.bin";
+	private String pathx86 = "C:/Program Files (x86)/LibreOffice/program/", path3 = "F:\\My_map\\New_folder";
 
 
 	private CharsetDetector checkDecoder = new CharsetDetector();
@@ -75,10 +73,10 @@ public class TestCreateReaderFromFile {
 	public void init() 
 	{
 		
-		docCon = new DocumentConverter(libreOfficePathWin);
+		docCon = new DocumentConverter(pathx86);
 		CloseLibreOffice cLO = new CloseLibreOffice(docCon);
 		try {
-			listOfFilesAndDirectory(path2);
+			listOfFilesAndDirectory(path3);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -96,10 +94,10 @@ public class TestCreateReaderFromFile {
 		{
 			if(f.getName().endsWith(".pdf"))
 			{
-				/*if(!validatePdf1abFile(f))
-				{*/
+				if(!validatePdf1abFile(f))
+				{
 					convertPDFToPDFA(f,cLO);
-				//}
+				}
 			}
 
 			//System.out.println("Filename : " + f.getName());
@@ -109,66 +107,14 @@ public class TestCreateReaderFromFile {
 
 	}
 
-	@SuppressWarnings("unchecked")
-	private File apacheFop(File pdfFile) throws IOException
-	{
-		File pdfAfile = new File(pdfFile.getParentFile().getAbsolutePath(), "TestPdfa.pdf");
-		OutputStream out = new BufferedOutputStream(new FileOutputStream(pdfAfile));
-		try {
-			// Step 1: Construct a FopFactory
-			// (reuse if you plan to render multiple documents!)
-			FopFactory fopFactory = FopFactory.newInstance(pdfFile);
-
-			// Step 2: Set up output stream.
-			// Note: Using BufferedOutputStream for performance reasons (helpful with FileOutputStreams).
-			//OutputStream out = new BufferedOutputStream(new FileOutputStream(new File("C:/Temp/myfile.pdf")));
-
-			FOUserAgent foUserAgent = fopFactory.newFOUserAgent(); 
-			foUserAgent.getRendererOptions().put("pdf-a-mode","PDF/A-1b");
-
-			// Step 3: Construct fop with desired output format
-			Fop fop = fopFactory.newFop(MimeConstants.MIME_PDF, out);
-
-			// Step 4: Setup JAXP using identity transformer
-			TransformerFactory factory = TransformerFactory.newInstance();
-			Transformer transformer = factory.newTransformer(); // identity transformer
-
-			// Step 5: Setup input and output for XSLT transformation
-			// Setup input stream
-			Source src = new StreamSource(new File("C:/Temp/myfile.fo"));
-
-			// Resulting SAX events (the generated FO) must be piped through to FOP
-			Result res = new SAXResult(fop.getDefaultHandler());
-
-			// Step 6: Start XSLT transformation and FOP processing
-			transformer.transform(src, res);
-
-		} catch (TransformerConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (TransformerException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch(SAXException e){
-
-		} finally {
-			//Clean-up
-			out.close();
-		}
-		return pdfAfile;
-	}
-
 	public void convertPDFToPDFA(File pdfFile, CloseLibreOffice cLO)
 	{
 
-		//File pdfFile = new File(pdfFilePath);
-
-		//pdfFile = new File("H:\\Skrivbord\\msOfficeFiles\\Min_Aktivitetsrapport_201710-47051.pdf");
-
 		File tmpFile = pdfFile;
-
+		System.out.println(tmpFile.getAbsolutePath());
+		
 		pdfFile = docCon.traverseAndConvert1(pdfFile);
-		docCon.getBsc().disconnect();
+		//docCon.getBsc().disconnect();
 		cLO.init();
 		
 		System.out.println(pdfFile.getAbsolutePath());
@@ -188,7 +134,7 @@ public class TestCreateReaderFromFile {
 		if(isRenamed)
 		{
 			System.out.println("Success!");
-			docCon.removeMsOfficeFormatFile(pdfFile);
+			//docCon.removeMsOfficeFormatFile(pdfFile);
 		}else {
 			System.out.println("Fail!");
 		}
@@ -296,8 +242,7 @@ public class TestCreateReaderFromFile {
 
 	private boolean validatePdf1abFile(File file)
 	{
-		VeraGreenfieldFoundryProvider.initialise();
-
+		PdfBoxFoundryProvider.initialise();
 		try {
 			PDFAParser parser = Foundries.defaultInstance().createParser(file);
 			PDFAValidator validator = Foundries.defaultInstance().createValidator(parser.getFlavour(), false);
@@ -325,7 +270,7 @@ public class TestCreateReaderFromFile {
 		} catch (ValidationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		} 
 
 		return false;
 	}
