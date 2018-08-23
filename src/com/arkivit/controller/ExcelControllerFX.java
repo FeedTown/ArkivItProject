@@ -106,7 +106,7 @@ public class ExcelControllerFX extends Application {
 
 	}
 
-	/**
+	/**   
 	 * Gets the users input from text fields from the first scene
 	 */
 	public void saveContentButton() {
