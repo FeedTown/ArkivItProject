@@ -99,7 +99,7 @@ public class ExcelControllerFX extends Application {
 		this.stage = primaryStage;
 		stage.setScene(firstScene.getFirstScene());
 		stage.show();
-		stage.setOnCloseRequest(e -> Runtime.getRuntime().exit(0));
+		//stage.setOnCloseRequest(e -> Runtime.getRuntime().exit(0));
 		firstScene.addActionListenerForButton(new ActionListen());
 		secondScene.addActionListenerForButton(new ActionListen());
 
@@ -153,7 +153,7 @@ public class ExcelControllerFX extends Application {
 	 * @param event
 	 */
 	private void createButton(ActionEvent event){
-		boolean check = new File(model.getTargetexcelFilepath(), model.getExcelFileName()).exists();
+		//boolean check = new File(model.getTargetexcelFilepath(), model.getExcelFileName()).exists();
 		model.clearArrayList();
 		progressBar();
 		secondScene.getOpenTxtField().setText("");
@@ -194,8 +194,10 @@ public class ExcelControllerFX extends Application {
 	 */
 	private void saveButton(ActionEvent event, Stage stage) {
 		FileChooser fileChooser = new FileChooser();
-		String fileName = "";
-		fileChooser.setTitle("VA");
+		//String fileName = "";
+
+		fileChooser.setTitle("Save Excelfile");
+
 		//Set extension filter to .xlsx files
 		FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Excel files (*.xlsx)", "*.xlsx");
 		fileChooser.getExtensionFilters().add(extFilter);
@@ -211,7 +213,7 @@ public class ExcelControllerFX extends Application {
 
 			model.setExcelFileName(file.getName());
 
-			fileName = file.getName();
+			//fileName = file.getName();
 			//System.out.println(fileName);
 
 			secondScene.getSaveTxtField().setText(model.getTargetexcelFilepath());
@@ -246,7 +248,6 @@ public class ExcelControllerFX extends Application {
 
 	private void deleteButton(ActionEvent event) {
 		backupDir = null;
-
 		if(backupDir == null) {
 			secondScene.getBtnDelete().setDisable(true);
 			secondScene.getOverwriteCheckBox().setDisable(false);
@@ -330,26 +331,26 @@ public class ExcelControllerFX extends Application {
 	 */
 	public void openButton(ActionEvent e, Stage stage) {
 		File selectedDir = secondScene.getDirectoryChooser().showDialog(stage);
-		String path;
+		//String path;
 
 		if(selectedDir != null) {
 			secondScene.getBtnSaveAs().setDisable(false);
 			model.setSourceFolderPath(selectedDir.getAbsolutePath());
 			secondScene.getOpenTxtField().setText(model.getSourceFolderPath());
-			path = selectedDir.getAbsolutePath();
-			//System.out.println(path);
-			//view.getBtnSaveAs().setDisable(false);
-
-		}
-		/*if(selectedDir == null) {
-			//view.getOpenTxtField().setText("");
-			//view.getBtnSaveAs().setDisable(true);
-		}*/
-
-		if(e.getSource() == secondScene.getBtnOpenFile() && selectedDir != null) {
 			secondScene.getBtnSaveAs().setDisable(false);
 			secondScene.getMappCheckBox().setDisable(false);
+
 		}
+		
+		/*else if(selectedDir == null) {
+			secondScene.getOpenTxtField().setText("");
+			secondScene.getBtnSaveAs().setDisable(true);
+		}*/
+
+		/*if(e.getSource() == secondScene.getBtnOpenFile() && selectedDir != null) {
+			secondScene.getBtnSaveAs().setDisable(false);
+			secondScene.getMappCheckBox().setDisable(false);
+		}*/
 	}
 
 	/*
@@ -372,6 +373,8 @@ public class ExcelControllerFX extends Application {
 				firstScene.getMandatoryFieldsList().get(i).setId("");
 			}
 		}
+
+
 		if(emptyFields >= 1)
 		{
 			Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -486,7 +489,6 @@ public class ExcelControllerFX extends Application {
 				mapping = false;
 				overwrite = false;
 
-
 			}
 
 		});
@@ -495,15 +497,22 @@ public class ExcelControllerFX extends Application {
 		//System.out.println("Thread was not alive.");
 		loadingThread = new Thread(progressTask);
 		loadingThread.start();
-		
+
 	}
-	
+
 	public void setPathLibOfficeButton(ActionEvent event, Stage stage) {
 		
-		File selectedDir = secondScene.getfileChooser().showOpenDialog(stage);
-		String path = selectedDir.getAbsolutePath();
-		model.setLibOfficePath(path);
-		secondScene.getSetLibreOfficePathField().setText(path);
+		File selectedDir = secondScene.getDirectoryChooser().showDialog(stage);
+		
+		if(selectedDir != null)
+		{
+			String path = selectedDir.getAbsolutePath();
+			model.setLibOfficePath(path);
+			secondScene.getSetLibreOfficePathField().setText(path);
+			secondScene.getBtnOpenFile().setDisable(false);
+		}
+
+
 	}
 
 	private Task<?> getProgress() {
@@ -557,22 +566,18 @@ public class ExcelControllerFX extends Application {
 
 			if(event.getSource().equals(firstScene.getSaveButton()))
 			{
-				saveContentButton();
-				stage.setScene(secondScene.getSecondScene());
-
-				/*if(checkRequestedFields() && validateEmail() && validateNumbers() == true) 
+				//stage.setScene(secondScene.getSecondScene());
+				if(checkRequestedFields() && validateEmail() && validateNumbers()) 
 				{
-
+					saveContentButton();
 					stage.setScene(secondScene.getSecondScene());
 					firstScene.getBALtxt().getStyleClass().remove("error");
 
-					secondScene.getMappCheckBox().setDisable(true);
+					/*secondScene.getMappCheckBox().setDisable(true);
 					secondScene.getOverwriteCheckBox().setDisable(true);
 					secondScene.getBtnConvert().setDisable(true);
-					secondScene.getBtnSaveAs().setDisable(true);
-
-
-				}*/
+					secondScene.getBtnSaveAs().setDisable(true);*/
+				}
 			}
 			if(event.getSource().equals(secondScene.getBtnSetPathLibOffice()))
 			{
@@ -621,7 +626,10 @@ public class ExcelControllerFX extends Application {
 
 	}
 
-	//DB-management disabled because server is down.
+
+	//******************************************************************************************************************
+	//******************************************************************************************************************
+	//DB-management disabled 
 	public void hibernateSession() {
 
 		/*
@@ -634,7 +642,6 @@ public class ExcelControllerFX extends Application {
 		try {
 			inputStream = new FileInputStream(file);
 		} catch (FileNotFoundException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		Blob blob = Hibernate.getLobCreator(session).createBlob(inputStream, file.length());

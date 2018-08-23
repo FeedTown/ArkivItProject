@@ -3,13 +3,10 @@ package com.arkivit.model;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
-import com.arkivit.controller.ExcelControllerFX;
-import com.arkivit.view.SecondScene;
 
 /**
  * 
@@ -134,6 +131,7 @@ public class MappingLog {
 			log.info("\n Path: " + path
 					+ "\n "+ mappedName+" " + mappedTemp.getName() + "\n" + 
 					orgName + " "+ charIllegalList.get(count)+ "\n");
+			
 
 			count++;
 		} 
@@ -152,7 +150,6 @@ public class MappingLog {
 
 			log.info("\n "+ mappedName+ " " + mappedTemp + "\n");
 		} 
-
 
 	}
 	

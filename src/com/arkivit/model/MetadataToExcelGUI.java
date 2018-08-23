@@ -99,21 +99,20 @@ public class MetadataToExcelGUI{
 		//fileList = new ArrayList<File>();
 		//testMeth();
 	} 
-
+	
 	/**
 	 * Name of source folder instantiated and
 	 * if mapping = true the method copyFolder gets called.
 	 * listOfFilesAndDirectory and getAndAddFileDataToList get called.
-	 * @param mapping A boolean, false by default
-	 * @throws IOException 
-	 * @throws TranscoderException 
-	 * 
+	 * @param mapp A boolean variable, false by default
+	 * @param overW A boolean variable, false by default
+	 * @throws IOException
 	 */
 	public void init(boolean mapp, boolean overW) throws IOException{
 
 		this.mapping = mapp;
 		this.overwrite = overW;
-		
+		//
 		docCon = new DocumentConverter(libOfficePath);
 		CloseLibreOffice closeLib = new CloseLibreOffice(docCon);
 		
@@ -134,9 +133,8 @@ public class MetadataToExcelGUI{
 			{
 				if(!validatePdf1abFile(f))
 				{
-					f = convertPDFToPDFA(f, closeLib);
+					f = convertPDFToPDFA(f);
 				}
-				
 				
 			}
 		}	
@@ -147,8 +145,15 @@ public class MetadataToExcelGUI{
 		
 
 	}
-
-	public File convertPDFToPDFA(File pdfFile, CloseLibreOffice cLO)
+	
+	
+	/**
+	 * This class converts normal pdf file to pdf/a file. File pdfFile is a normal pdf. 
+	 * 
+	 * @param pdfFile is File object
+	 * @return
+	 */
+	public File convertPDFToPDFA(File pdfFile)
 	{
 
 		File tmpFile = pdfFile;
@@ -158,15 +163,15 @@ public class MetadataToExcelGUI{
 		
 		System.out.println(pdfFile.getAbsolutePath());
 
-		File pdfAFile = new File(tmpFile.getAbsolutePath());
+		//File pdfAFile = new File(tmpFile.getAbsolutePath());
 
 		docCon.removeMsOfficeFormatFile(tmpFile);
 		docCon.getOriginalListFile().clear();
 
-		System.out.println("Renamed file works? " + pdfAFile.getAbsolutePath());
+		System.out.println("Renamed file works? " + tmpFile.getAbsolutePath());
 		System.out.println("Original file works? " + pdfFile.getAbsolutePath());
 
-		boolean isRenamed = pdfFile.renameTo(pdfAFile);
+		boolean isRenamed = pdfFile.renameTo(tmpFile);
 
 		System.out.println("Temp file :" + tmpFile);
 
@@ -178,7 +183,7 @@ public class MetadataToExcelGUI{
 			System.out.println("Fail!");
 		}
 		
-		return pdfAFile;
+		return tmpFile;
 
 	}
 	

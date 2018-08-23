@@ -92,6 +92,7 @@ public class SecondScene{
 		btnSetPathLibOffice.setMaxWidth(Double.MAX_VALUE);
 		
 		btnOpenFile = new Button("Select folder...");
+		btnOpenFile.setDisable(true);
 		btnOpenFile.setId("saveButton");
 		btnOpenFile.setMaxWidth(Double.MAX_VALUE);
 		

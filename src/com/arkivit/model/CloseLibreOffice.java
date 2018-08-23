@@ -6,9 +6,19 @@ import java.io.InputStreamReader;
 
 import com.arkivit.model.converters.DocumentConverter;
 
+
+/**
+ * This is used for closing libreOffice, where it checks first if libreOffice process is open or not and takes action.
+ * You just need to create this class, where it takes in a DocumentConverter Class on the constructor as parameter,
+ *  and call for the init method and the class handles the rest.
+ * 
+ * @author Saikat
+ *
+ */
+
 public class CloseLibreOffice {
 	
-	private String TASKLIST = "tasklist";
+	private String TASKLIST = "tasklist", libreOfficeAppMac = "LibreOffice.app", libreOfficeAppWin = "soffice.bin";
 	private DocumentConverter docCon;
 	
 	public CloseLibreOffice(DocumentConverter docCon) {
@@ -16,22 +26,15 @@ public class CloseLibreOffice {
 		this.docCon = docCon;
 		
 	}
-	
-	public static void main(String[] args)
-	{
-		//CloseLibreOffice closeLO = new CloseLibreOffice();
 		
-		//closeLO.init();
-	}
-	
 	public void init()
 	{
-		String libreOfficeAppMac = "LibreOffice.app", libreOfficeAppWin = "soffice.bin";
+		
 		if(isProcessRunning(libreOfficeAppMac,libreOfficeAppWin))
 		{
 			System.out.println("LibreOffice is opened.");
 			closeLB(libreOfficeAppMac,libreOfficeAppWin);
-			docCon.getBsc().disconnect();
+			//docCon.getBsc().disconnect();
 			init();
 		
 		}
@@ -40,7 +43,7 @@ public class CloseLibreOffice {
 		}
 	}
 	
-	public void init2()
+	/*public void init2()
 	{
 		String libreOfficeAppMac = "LibreOffice.app", libreOfficeAppWin = "soffice.bin";
 		if(isProcessRunning(libreOfficeAppMac,libreOfficeAppWin))
@@ -51,7 +54,7 @@ public class CloseLibreOffice {
 		else {
 			System.out.println("LibreOffice is closed.");
 		}
-	}
+	}*/
 	public boolean isProcessRunning(String libreOfficeAppMac, String libreOfficeAppWin) {
 
 		Process p;
